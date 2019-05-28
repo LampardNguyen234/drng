@@ -9,6 +9,6 @@ p = Party()
 
 x = p.VRF.Prove(10)
 
-print (ECVRF.Verify())
+print (ECVRF.Verify(10, x['pi'], x['y']))
 # x = RandomOrder()
 # print(x)

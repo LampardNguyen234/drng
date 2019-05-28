@@ -25,12 +25,13 @@ class ECVRF(object):
 
         return {'beta': beta, 'pi': pi, 'y': self.y}
     
-    @classmethod
+    @staticmethod
     def Verify(alpha, pi, y):
         #Extract gamma, c, s from pi
         gamma = pi['gamma']
         c = pi['c']
         s = pi['s']
+        Y = pi['y']
 
         U = c*Y + s*G
 
