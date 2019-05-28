@@ -14,6 +14,33 @@ CURVE = curve_256
 G = generator_256
 ORDER = G.order()
 
+def ComputeThreshold(k, n, l):    
+    return k*(2**l)//(n+1)
+
+def VerifyZKP(Y, M, C, D, c, z):
+    B0 = z*G + (ORDER - c)*Y
+    B1 = z*C + (ORDER - c)* (D-M)
+
+    h = SHA256.new()
+    h.update(str(Y).encode())
+    h.update(str(C).encode())
+    h.update(str(D-M).encode())
+    h.update(str(B0).encode())
+    h.update(str(B1).encode())
+    
+    return c == int(h.hexdigest(), 16)
+
+def VerifyContribution(publicKey, C, D):
+    pass
+
+def VerifyEligibility(publicKey, T, y, pi, Th):
+    pass
+
+def GenerateTicket(publicKey, nonce):
+    h = SHA256.new()
+    h.update(str(publicKey).encode())
+    h.update(str(nonce).encode())
+    return h.hexdigest()
 
 def egcd(a, b):
     if a == 0:
