@@ -76,6 +76,9 @@ class Point(object):
       assert self.__curve.contains_point(x, y)
     if order:
       assert self * order == INFINITY
+  
+  def __str__(self):
+    return "{}, {}".format(self.__x, self.__y)
 
   def __eq__(self, other):
     """Return True if the points are identical, False otherwise."""

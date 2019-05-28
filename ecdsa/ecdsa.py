@@ -62,6 +62,9 @@ class Public_key(object):
       raise RuntimeError("Generator point order is bad.")
     if point.x() < 0 or n <= point.x() or point.y() < 0 or n <= point.y():
       raise RuntimeError("Generator point has x or y out of range.")
+  
+  def __str__(self):
+    return str(self.point)
 
   def verifies(self, hash, signature):
     """Verify that signature is a valid signature of hash.
@@ -97,6 +100,9 @@ class Private_key(object):
 
     self.public_key = public_key
     self.d = d
+  
+  def __str__(self):
+    return str(self.d)
 
   def sign(self, hash, random_k):
     """Return a signature for the provided hash, using the provided

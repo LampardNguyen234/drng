@@ -1,7 +1,19 @@
 from common import *
+from ecdsa.ecdsa import *
+from Crypto.Hash import SHA256
+from party import Party
 
-x = GenerateTicket(1, 1)
-print(x)
 
-Th = ComputeThreshold(10, 100, 256)
-print(Th)
+x = RandomOrder()
+Y = x*G
+T = GenerateTicket(Y, RandomOrder())
+print(T)
+
+p = Party()
+
+poc = p.Contribute(T)
+
+print(poc)
+
+# x = RandomOrder()
+# print(x)

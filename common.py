@@ -8,11 +8,31 @@ import socket
 
 import config
 from Crypto.Hash import SHA256
-from ecdsa.ecdsa import *
+from ecdsa.ecdsa import curve_256, generator_256
+from Crypto.Random import random
 
 CURVE = curve_256
 G = generator_256
 ORDER = G.order()
+
+class PoE(object):
+    def __init__(self, publickKey, T, y, pi):
+        self.publicKey = publickKey
+        self.T = T
+        self.y = y
+        self.pi = pi
+
+class PoC(object):
+    def __init__(self, publicKey, T, C, D, sigma):
+        self.publicKey = publicKey
+        self.T = T
+        self.C = C
+        self.D = D
+        self.sigma = sigma
+    
+    def verify(self):
+        pass
+
 
 def ComputeThreshold(k, n, l):    
     return k*(2**l)//(n+1)
@@ -54,6 +74,9 @@ def GenerateTicket(publicKey, nonce):
     h.update(str(publicKey).encode())
     h.update(str(nonce).encode())
     return h.hexdigest()
+
+def RandomOrder():
+    return random.randint(0, ORDER)
 
 def egcd(a, b):
     if a == 0:
@@ -127,26 +150,9 @@ def write_message(conn, obj):
     buf_to_write = struct.pack("!i", msg_size) + msg
     conn.sendall(buf_to_write)
 
-def verify_blind_signature(m, r, s):
-    Q = get_public_key_from_em().point
 
-    X = modinv(f(m), ORDER) * (s*G + (ORDER - f(r))*Q)
-
-    return X.x() == r
-
-
-def get_public_key_from_em():
-    """
-    Gets public keys from the EM
-
-    :return: public keys
-    """
-    sock_to_em = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock_to_em.connect(config.EM_ADDR)
-    write_message(sock_to_em, em_interface.ReqPublicKeys())
-    pub_keys = read_message(sock_to_em)
-    # socket will be closed by the EM server
-    return pub_keys
+def get_public_key_from_requester():
+    return 10*G
 
 # --- Private ---
 
