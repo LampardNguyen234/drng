@@ -17,17 +17,30 @@ ORDER = G.order()
 def ComputeThreshold(k, n, l):    
     return k*(2**l)//(n+1)
 
+def TallyContribute(C, D):
+    if len(C) != len(D):
+        return None
+    C_temp = C[0]
+    D_temp = D[0]
+    for i in range(1, len(C)):
+        C_temp = C_temp + C[i]
+        D_temp = D_temp + D[i]
+    
+    return C_temp, D_temp
+
+
 def VerifyZKP(Y, M, C, D, c, z):
     B0 = z*G + (ORDER - c)*Y
-    B1 = z*C + (ORDER - c)* (D-M)
+    D2 = D + (ORDER - 1)*M
+    B1 = z*C + (ORDER - c)* D2
 
     h = SHA256.new()
     h.update(str(Y).encode())
     h.update(str(C).encode())
-    h.update(str(D-M).encode())
+    h.update(str(D2).encode())
     h.update(str(B0).encode())
     h.update(str(B1).encode())
-    
+
     return c == int(h.hexdigest(), 16)
 
 def VerifyContribution(publicKey, C, D):
