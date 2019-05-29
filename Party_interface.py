@@ -1,4 +1,5 @@
 from Crypto.Hash import SHA256
+
 class PoE(object):
     def __init__(self, publickKey, T, y, pi):
         self.publicKey = publickKey

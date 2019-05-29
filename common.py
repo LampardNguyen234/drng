@@ -8,7 +8,7 @@ import socket
 
 import config
 from Crypto.Hash import SHA256
-from ecdsa.ecdsa import curve_256, generator_256
+from ecdsa.ecdsa import curve_256, generator_256, Signature
 from ecdsa.ellipticcurve import Point
 from Crypto.Random import random
 import PDL_interface
@@ -135,6 +135,9 @@ def GenerateTicket(publicKey, nonce):
 def RandomOrder():
     return random.randint(0, ORDER)
 
+def CreateSignature(r, s):
+    return Signature(r,s)
+
 def egcd(a, b):
     if a == 0:
         return (b, 0, 1)
@@ -247,6 +250,12 @@ def _to_json(python_object):
     elif isinstance(python_object, PDL_interface.RespTicket):
         return  {'__class__': 'RespTicket',
                  '__value__': python_object.to_dictionary()}
+    elif isinstance(python_object, PDL_interface.ReqContribution):
+        return  {'__class__': 'ReqContribution',
+                 '__value__': python_object.to_dictionary()}
+    elif isinstance(python_object, PDL_interface.RespContribution):
+        return  {'__class__': 'RespContribution',
+                 '__value__': python_object.to_dictionary()}
     
     raise TypeError(repr(python_object) + ' is not JSON serializable')
 
@@ -285,4 +294,10 @@ def _from_json(json_object):
     elif '__class__' in json_object:
         if json_object['__class__'] == 'RespTicket':
             return PDL_interface.RespTicket.from_dictionary(json_object['__value__'])
+    elif '__class__' in json_object:
+        if json_object['__class__'] == 'ReqContribution':
+            return PDL_interface.ReqContribution.from_dictionary(json_object['__value__'])
+    elif '__class__' in json_object:
+        if json_object['__class__'] == 'RespContribution':
+            return PDL_interface.RespContribution.from_dictionary(json_object['__value__'])
     return json_object
