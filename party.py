@@ -18,23 +18,37 @@ class Party(object):
         self.VRF = ECVRF(self.private_key)
 
     def CheckEligibility(self, T, Th):
+        """A party checks if he is eligible to contribute or not (Algorithm 3)
+        
+        Arguments:
+            T -- The input ticket
+            Th -- The threshold
+        """
         out = self.VRF.Prove(T)
-        beta = out['beta']
+        y = out['y']
         pi = out['pi']
         if beta < Th:
-            return True, beta, pi
+            return True, y, pi
         else:
             return False, None, None
 
-    def Contribute(self, T):
-        eligi, beta, pi = self.CheckEligibility(T, Th)
-        if eligi:
-            Y = get_public_key_from_requester()
+    def Contribute(self, T, Th, Y):
+        """A party checks his eligibility. If eligible, he has to contribute a number subject to the
+        ticket T (Algorithm 4). 
+        
+        Arguments:
+            T -- The input ticket
+            Th -- The threshold
+            Y -- The encryption key of the requester
+        """
+        eligible, y, pi = self.CheckEligibility(T, Th)
+        
+        if eligible:
+            # Y = get_public_key_from_requester()
             x = RandomOrder()
             M = x*G
 
             k = RandomOrder()
-
             C = k*G
             D = k*Y + M
 
@@ -46,7 +60,6 @@ class Party(object):
 
             sigma = self.private_key.sign(h, RandomOrder())
 
-            return PoC(self.public_key, T, C, D, sigma)
-
-    def CheckEligibility(self, T, Th):
-        pass
+            return PoE(self.private_key.public_key, T, y, pi), PoC(self.public_key, T, C, D, sigma)
+        else:
+            return None, None

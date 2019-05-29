@@ -15,31 +15,31 @@ CURVE = curve_256
 G = generator_256
 ORDER = G.order()
 
-def ECVRF_hash_to_curve(alpha, Y=None):
+def ECVRF_hash_to_curve(alpha, pk=None):
     """Hash an integer in to the target curve
     
     Arguments:
-        y  -- An additional input
+        y  -- An additional input (usually the public key)
         alpha [Int] -- An input integer
     
     Returns:
         alpha * Generator + Y
     """
-    if Y is None:
+    if pk is None:
         return alpha * G
     else:
-        return alpha*G + Y
+        return alpha*G + pk
 
-def ECVRF_hash_points(g, h, y, gamma, gk, hk):
+def ECVRF_hash_points(g, h, pk, gamma, gk, hk):
     """Calculate the hash of many points, used in the VRF
     
     Arguments:
-        g, h, y, gamma, gk, hk -- Points on curve
+        g, h, pk, gamma, gk, hk -- Points on curve
     """
     ha = SHA256.new()
     ha.update(str(g).encode())
     ha.update(str(h).encode())
-    ha.update(str(y).encode())
+    ha.update(str(pk).encode())
     ha.update(str(gamma).encode())
     ha.update(str(gk).encode())
     ha.update(str(hk).encode())
