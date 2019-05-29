@@ -46,7 +46,7 @@ class ReqThreshold:
     Request to get the Threshold
     """
     def __repr__(self):
-        return "<ReqThreshold: Request for thr Threshold>"
+        return "<ReqThreshold: Request for the Threshold>"
 
     @classmethod
     def from_dictionary(cls, params):
@@ -72,3 +72,37 @@ class RespThreshold:
 
     def to_dictionary(self):
         return {'threshold': self.threshold}
+
+class ReqPubKey:
+    """
+    Request to get the encryption key of the requester
+    """
+    def __repr__(self):
+        return "<ReqPubKey: Request for the encryption key>"
+
+    @classmethod
+    def from_dictionary(cls, params):
+        return cls()
+
+    def to_dictionary(self):
+        return {}
+
+class RespPubKey:
+    """
+    Response to generate a ticket
+    """
+    def __init__(self, pubkey_X, pubkey_Y):
+        self.pubkey_X = pubkey_X
+        self.pubkey_Y = pubkey_Y
+
+    def __repr__(self):
+        return "<RespPubKey: pubkey_X: {}, pubkey_Y: {}>".format(self.pubkey_X, self.pubkey_Y)
+
+    @classmethod
+    def from_dictionary(cls, params):
+        pubkey_X = params['pubkey_X']
+        pubkey_Y = params['pubkey_Y']
+        return cls(pubkey_X, pubkey_Y)
+
+    def to_dictionary(self):
+        return {'pubkey_X': self.pubkey_X, 'pubkey_Y': self.pubkey_Y}

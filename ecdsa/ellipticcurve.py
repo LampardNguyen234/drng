@@ -82,6 +82,15 @@ class Point(object):
   
   def __repr__(self):
     return "<Point: x: {}, y: {}>".format(self.__x, self.__y)
+  
+  @classmethod
+  def from_dictionary(cls, params):
+      x = params['x']
+      y = params['y']
+      return cls()
+
+  def to_dictionary(self):
+      return {'x': self.__x, 'y': self.__y}
 
   def __eq__(self, other):
     """Return True if the points are identical, False otherwise."""

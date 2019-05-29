@@ -268,8 +268,14 @@ def _to_json(python_object):
     elif isinstance(python_object, PDL_interface.RespThreshold):
         return  {'__class__': 'RespThreshold',
                  '__value__': python_object.to_dictionary()}
+    elif isinstance(python_object, PDL_interface.ReqPubKey):
+        return  {'__class__': 'ReqPubKey',
+                 '__value__': python_object.to_dictionary()}
+    elif isinstance(python_object, PDL_interface.RespPubKey):
+        return  {'__class__': 'RespPubKey',
+                 '__value__': python_object.to_dictionary()}
     
-    raise PointError(repr(python_object) + ' is not JSON serializable')
+    raise TypeError(repr(python_object) + ' is not JSON serializable')
 
 
 def _from_json(json_object):
@@ -294,4 +300,10 @@ def _from_json(json_object):
     elif '__class__' in json_object:
         if json_object['__class__'] == 'RespThreshold':
             return PDL_interface.RespThreshold.from_dictionary(json_object['__value__'])
+    elif '__class__' in json_object:
+        if json_object['__class__'] == 'ReqPubKey':
+            return PDL_interface.ReqPubKey.from_dictionary(json_object['__value__'])
+    elif '__class__' in json_object:
+        if json_object['__class__'] == 'RespPubKey':
+            return PDL_interface.RespPubKey.from_dictionary(json_object['__value__'])
     return json_object

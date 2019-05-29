@@ -3,6 +3,7 @@ from ecdsa.ecdsa import Private_key, Public_key
 from ECVRF import ECVRF
 from Crypto.Random import random
 from Crypto.Hash import SHA256
+import PDL_interface
 
 class Party(object):
     def __init__(self, private_key = None):
@@ -63,3 +64,16 @@ class Party(object):
             return PoE(self.private_key.public_key, T, y, pi), PoC(self.public_key, T, C, D, sigma)
         else:
             return None, None
+
+def KickOff():
+    party = Party()
+
+    sock_to_PDL = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock_to_PDL.connect(config.PDL_ADDR)
+    req = PDL_interface.ReqPubKey()
+    write_message(sock_to_PDL, req)
+    resp = read_message(sock_to_PDL)
+    print(resp)
+
+if __name__ == '__main__':
+    KickOff()

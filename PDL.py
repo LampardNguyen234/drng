@@ -35,9 +35,52 @@ def HandleMessage(msg, conn, state):
     print("Received a new message: {}".format(msg))
     if msg['__class__'] == 'ReqGenTick':
         HandleGenerateTicket(msg['__value__'], conn, state)
+    elif msg['__class__'] == 'ReqThreshold':
+        HandleThresholdRequest(msg['__value__'], conn, state)
+    elif msg['__class__'] == 'ReqPubKey':
+        HandlePubKeyRequest(msg['__value__'], conn, state)
+
+def HandlePubKeyRequest(msg, conn, state):
+    """Handles the request for getting the encryption key from requesters. If not existed, return an error.
+    
+    Arguments:
+        msg -- message from the Requester
+        conn -- the connection socket
+        state -- current state of the PDL
+    """
+
+    #If the Threshold has been defined
+    if state.currentPubKey:
+        common.write_message(conn, RespPubKey(state.currentPubKey))
+    else:
+        common.write_message(conn, common.RespError("The Requester has not connected yet!"))
+
+def HandleThresholdRequest(msg, conn, state):
+    """Handles the request for getting the Threshold. If not existed, return an error.
+    
+    Arguments:
+        msg -- message from the Requester
+        conn -- the connection socket
+        state -- current state of the PDL
+    """
+
+    #If the Threshold has been defined
+    if state.currentThreshold:
+        common.write_message(conn, RespThreshold(state.currentThreshold))
+    else:
+        common.write_message(conn, common.RespError("The Threshold has not been defined yet!"))
 
 
 def HandleGenerateTicket(msg, conn, state):
+    """Handles the request for generating new ticket from the Requester. If existed, return an error.
+    
+    Arguments:
+        msg -- message from the Requester
+        conn -- the connection socket
+        state -- current state of the PDL
+    """
+
+    #If the ticket has not been created or the current one has not been expired
     if state.isExpired:
         state.isExpired = False
 
@@ -47,10 +90,11 @@ def HandleGenerateTicket(msg, conn, state):
 
         nonce = msg['nonce']
         state.currentTicket = common.GenerateTicket(pubkey, nonce)
-        state.currentThreshold = common.ComputeThreshold(config.EXPECTED_NUM_CONTRIBUTORS, config.NUM_PARTIES, 256)
         state.currentPubKey = pubkey
         print("State", state)
         common.write_message(conn, RespGenTick(state.currentTicket))
+    else:
+        common.write_message(conn, common.RespError("The current ticket has not been expired yet!"))
 
 class PDLState:
     """
