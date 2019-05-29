@@ -10,10 +10,53 @@ import config
 from Crypto.Hash import SHA256
 from ecdsa.ecdsa import curve_256, generator_256
 from Crypto.Random import random
+import PDL_interface
 
 CURVE = curve_256
 G = generator_256
 ORDER = G.order()
+
+class PoE(object):
+    def __init__(self, publickKey, T, y, pi):
+        self.publicKey = publickKey
+        self.T = T
+        self.y = y
+        self.pi = pi
+
+class PoC(object):
+    def __init__(self, publicKey, T, C, D, sigma):
+        self.publicKey = publicKey
+        self.T = T
+        self.C = C
+        self.D = D
+        self.sigma = sigma
+    
+    def verify(self):
+        h = SHA256.new()
+        h.update(str(self.C).encode())
+        h.update(str(self.D).encode())
+        h = h.hexdigest()
+        h = int(h, 16)
+
+        return self.publicKey.verify(h, self.sigma)
+
+class RespError:
+    """
+    represents an error response from the server
+    """
+    def __init__(self, msg):
+        self.msg = msg
+
+    def __str__(self):
+        return "<RespError: {}>".format(self.msg)
+
+    @classmethod
+    def from_dictionary(cls, params):
+        msg = params['msg']
+        return cls(msg)
+
+    def to_dictionary(self):
+        return {'msg': self.msg}
 
 def ECVRF_hash_to_curve(alpha, pk=None):
     """Hash an integer in to the target curve
@@ -77,30 +120,6 @@ def EC2OSP(P):
 def OS2ECP():
     pass
 
-class PoE(object):
-    def __init__(self, publickKey, T, y, pi):
-        self.publicKey = publickKey
-        self.T = T
-        self.y = y
-        self.pi = pi
-
-class PoC(object):
-    def __init__(self, publicKey, T, C, D, sigma):
-        self.publicKey = publicKey
-        self.T = T
-        self.C = C
-        self.D = D
-        self.sigma = sigma
-    
-    def verify(self):
-        h = SHA256.new()
-        h.update(str(self.C).encode())
-        h.update(str(self.D).encode())
-        h = h.hexdigest()
-        h = int(h, 16)
-
-        return self.publicKey.verify(h, self.sigma)
-
 
 def ComputeThreshold(k, n, l):    
     return k*(2**l)//(n+1)
@@ -159,24 +178,6 @@ def modinv(a, m):
         raise Exception('modular inverse does not exist')
     else:
         return x % m
-
-class RespError:
-    """
-    represents an error response from the server
-    """
-    def __init__(self, msg):
-        self.msg = msg
-
-    def __str__(self):
-        return "<RespError: {}>".format(self.msg)
-
-    @classmethod
-    def from_dictionary(cls, params):
-        msg = params['msg']
-        return cls(msg)
-
-    def to_dictionary(self):
-        return {'msg': self.msg}
 
 
 def read_message(conn):
@@ -253,49 +254,12 @@ def _to_json(python_object):
     if isinstance(python_object, RespError):
         return  {'__class__': 'RespError',
                  '__value__': python_object.to_dictionary()}
-    elif isinstance(python_object, em_interface.ReqPublicKeys):
-        return {'__class__': 'em_interface.ReqPublicKeys',
-                '__value__': python_object.to_dictionary()}
-    elif isinstance(python_object, em_interface.RespPublicKeys):
-        return {'__class__': 'em_interface.RespPublicKeys',
-                '__value__': python_object.to_dictionary()}
-    elif isinstance(python_object, em_interface.ReqBlindSign):
-        return {'__class__': 'em_interface.ReqBlindSign',
-                '__value__': python_object.to_dictionary()}
-    elif isinstance(python_object, em_interface.RespBlindSign):
-        return {'__class__': 'em_interface.RespBlindSign',
-                '__value__': python_object.to_dictionary()}
-    elif isinstance(python_object, bb_interface.ReqCastVote):
-        return {'__class__': 'bb_interface.ReqCastVote',
-                '__value__': python_object.to_dictionary()}
-    elif isinstance(python_object, bb_interface.RespCastVoteSuccess):
-        return {'__class__': 'bb_interface.RespCastVoteSuccess',
-                '__value__': python_object.to_dictionary()}
-    elif isinstance(python_object, bb_interface.RespVotingClosed):
-        return {'__class__': 'bb_interface.RespVotingClosed',
-                '__value__': python_object.to_dictionary()}
-    elif isinstance(python_object, bb_interface.ReqCloseVoting):
-        return {'__class__': 'bb_interface.ReqCloseVoting',
-                '__value__': python_object.to_dictionary()}
-    elif isinstance(python_object, em_interface.ReqLogin):
-        return {'__class__': 'em_interface.ReqLogin',
-                '__value__': python_object.to_dictionary()}
-    elif isinstance(python_object, em_interface.RespLogin):
-        return {'__class__': 'em_interface.RespLogin',
-                '__value__': python_object.to_dictionary()}
-    elif isinstance(python_object, bb_interface.ReqKeyVote):
-        return {'__class__': 'bb_interface.ReqKeyVote',
-                '__value__': python_object.to_dictionary()}
-    elif isinstance(python_object, bb_interface.RespKeyVoteSuccess):
-        return {'__class__': 'bb_interface.RespKeyVoteSuccess',
-                '__value__': python_object.to_dictionary()}
-    elif isinstance(python_object, bb_interface.ReqAllVote):
-        return {'__class__': 'bb_interface.ReqAllVote',
-                '__value__': python_object.to_dictionary()}
-    elif isinstance(python_object, bb_interface.RespAllVote):
-        return {'__class__': 'bb_interface.RespAllVote',
-                '__value__': python_object.to_dictionary()}
-
+    elif isinstance(python_object, PDL_interface.ReqGenTick):
+        return  {'__class__': 'ReqGenTick',
+                 '__value__': python_object.to_dictionary()}
+    elif isinstance(python_object, PDL_interface.RespGenTick):
+        return  {'__class__': 'RespGenTick',
+                 '__value__': python_object.to_dictionary()}
     raise PointError(repr(python_object) + ' is not JSON serializable')
 
 
@@ -308,33 +272,11 @@ def _from_json(json_object):
     if '__class__' in json_object:
         if json_object['__class__'] == 'RespError':
             return RespError.from_dictionary(json_object['__value__'])
-        elif json_object['__class__'] == 'em_interface.ReqPublicKeys':
-            return em_interface.ReqPublicKeys.from_dictionary(json_object['__value__'])
-        elif json_object['__class__'] == 'em_interface.RespPublicKeys':
-            return em_interface.RespPublicKeys.from_dictionary(json_object['__value__'])
-        elif json_object['__class__'] == 'em_interface.ReqBlindSign':
-            return em_interface.ReqBlindSign.from_dictionary(json_object['__value__'])
-        elif json_object['__class__'] == 'em_interface.RespBlindSign':
-            return em_interface.RespBlindSign.from_dictionary(json_object['__value__'])
-        elif json_object['__class__'] == 'bb_interface.ReqCastVote':
-            return bb_interface.ReqCastVote.from_dictionary(json_object['__value__'])
-        elif json_object['__class__'] == 'bb_interface.RespCastVoteSuccess':
-            return bb_interface.RespCastVoteSuccess.from_dictionary(json_object['__value__'])
-        elif json_object['__class__'] == 'bb_interface.RespVotingClosed':
-            return bb_interface.RespVotingClosed.from_dictionary(json_object['__value__'])
-        elif json_object['__class__'] == 'bb_interface.ReqCloseVoting':
-            return bb_interface.ReqCloseVoting.from_dictionary(json_object['__value__'])
-        elif json_object['__class__'] == 'em_interface.ReqLogin':
-            return em_interface.ReqLogin.from_dictionary(json_object['__value__'])
-        elif json_object['__class__'] == 'em_interface.RespLogin':
-            return em_interface.RespLogin.from_dictionary(json_object['__value__'])
-        elif json_object['__class__'] == 'bb_interface.ReqKeyVote':
-            return bb_interface.ReqKeyVote.from_dictionary(json_object['__value__'])
-        elif json_object['__class__'] == 'bb_interface.RespKeyVoteSuccess':
-            return bb_interface.RespKeyVoteSuccess.from_dictionary(json_object['__value__'])
-        elif json_object['__class__'] == 'bb_interface.ReqAllVote':
-            return bb_interface.ReqAllVote.from_dictionary(json_object['__value__'])
-        elif json_object['__class__'] == 'bb_interface.RespAllVote':
-            return bb_interface.RespAllVote.from_dictionary(json_object['__value__'])
+    elif '__class__' in json_object:
+        if json_object['__class__'] == 'ReqGenTick':
+            return PDL_interface.ReqGenTick.from_dictionary(json_object['__value__'])
+    elif '__class__' in json_object:
+        if json_object['__class__'] == 'RespGenTick':
+            return PDL_interface.RespGenTick.from_dictionary(json_object['__value__'])
 
     return json_object

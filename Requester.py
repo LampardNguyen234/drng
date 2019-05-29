@@ -1,5 +1,7 @@
 from common import *
 from Crypto.Random import random
+import config
+import PDL_interface
 
 class Requester(object):
     
@@ -33,3 +35,10 @@ class Requester(object):
         z = (r + c*self.x) % ORDER
 
         return (c,z,B0,B1)
+
+def KickOff():
+    requester = Requester()
+    
+
+if __name__ == '__main__':
+    KickOff()
