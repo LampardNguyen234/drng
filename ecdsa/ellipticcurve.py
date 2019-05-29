@@ -79,6 +79,9 @@ class Point(object):
   
   def __str__(self):
     return "{}, {}".format(self.__x, self.__y)
+  
+  def __repr__(self):
+    return "<Point: x: {}, y: {}>".format(self.__x, self.__y)
 
   def __eq__(self, other):
     """Return True if the points are identical, False otherwise."""

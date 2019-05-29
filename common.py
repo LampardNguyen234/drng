@@ -9,6 +9,7 @@ import socket
 import config
 from Crypto.Hash import SHA256
 from ecdsa.ecdsa import curve_256, generator_256
+from ecdsa.ellipticcurve import Point
 from Crypto.Random import random
 import PDL_interface
 
@@ -116,9 +117,11 @@ def EC2OSP(P):
     return I2OSP(x, 32) + I2OSP(y, 32)
 
 
-
 def OS2ECP():
     pass
+
+def CreatePoint(Px, Py):
+    return Point(CURVE, Px, Py)
 
 
 def ComputeThreshold(k, n, l):    
@@ -160,7 +163,7 @@ def GenerateTicket(publicKey, nonce):
     h = SHA256.new()
     h.update(str(publicKey).encode())
     h.update(str(nonce).encode())
-    return h.hexdigest()
+    return int(h.hexdigest(), 16)
 
 def RandomOrder():
     return random.randint(0, ORDER)
@@ -250,7 +253,6 @@ def _to_json(python_object):
     :param python_object: object to convert to json serializable object
     :return: json serializable representation of `python_object`
     """
-
     if isinstance(python_object, RespError):
         return  {'__class__': 'RespError',
                  '__value__': python_object.to_dictionary()}
@@ -260,6 +262,13 @@ def _to_json(python_object):
     elif isinstance(python_object, PDL_interface.RespGenTick):
         return  {'__class__': 'RespGenTick',
                  '__value__': python_object.to_dictionary()}
+    elif isinstance(python_object, PDL_interface.ReqThreshold):
+        return  {'__class__': 'ReqThreshold',
+                 '__value__': python_object.to_dictionary()}
+    elif isinstance(python_object, PDL_interface.RespThreshold):
+        return  {'__class__': 'RespThreshold',
+                 '__value__': python_object.to_dictionary()}
+    
     raise PointError(repr(python_object) + ' is not JSON serializable')
 
 
@@ -269,6 +278,7 @@ def _from_json(json_object):
     :param json: object to convert from
     :return: python object corresponding to json object
     """
+
     if '__class__' in json_object:
         if json_object['__class__'] == 'RespError':
             return RespError.from_dictionary(json_object['__value__'])
@@ -278,5 +288,10 @@ def _from_json(json_object):
     elif '__class__' in json_object:
         if json_object['__class__'] == 'RespGenTick':
             return PDL_interface.RespGenTick.from_dictionary(json_object['__value__'])
-
+    elif '__class__' in json_object:
+        if json_object['__class__'] == 'ReqThreshold':
+            return PDL_interface.ReqThreshold.from_dictionary(json_object['__value__'])
+    elif '__class__' in json_object:
+        if json_object['__class__'] == 'RespThreshold':
+            return PDL_interface.RespThreshold.from_dictionary(json_object['__value__'])
     return json_object
