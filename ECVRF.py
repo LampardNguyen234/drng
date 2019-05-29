@@ -18,7 +18,28 @@ class ECVRF(object):
         c = ECVRF_hash_points(G,H,self.y,gamma, k*G, k*H)
         s = (k - c*self.x)% ORDER
         pi = {'gamma': gamma, 'c': c,  's': s}
-        beta = SHA256.new(EC2OSP(gamma)).hexdigest()
 
-        return {'y': beta, 'pi': pi}
+        h = SHA256.new()
+        h.update(str(gamma).encode())
+        beta = int(h.hexdigest(), 16)
+
+        return {'beta': beta, 'pi': pi, 'y': self.y}
+    
+    @classmethod
+    def Verify(alpha, pi, y):
+        #Extract gamma, c, s from pi
+        gamma = pi['gamma']
+        c = pi['c']
+        s = pi['s']
+
+        U = c*Y + s*G
+
+        H = ECVRF_hash_to_curve(y, alpha)
+
+        V = c*gamma + s*H
+
+        c_prime = ECVRF_hash_points(G, H, Y, gamma, U, V)
+
+        return c == c_prime
+
     

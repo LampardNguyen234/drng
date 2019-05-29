@@ -2,13 +2,13 @@ from common import *
 from ecdsa.ecdsa import *
 from Crypto.Hash import SHA256
 from party import Party
-from ECVRF import *
+from ECVRF import ECVRF
 
 
-x = 10
-Y = x*G
+p = Party()
 
-print(EC2OSP(Y))
+x = p.VRF.Prove(10)
 
+print (ECVRF.Verify())
 # x = RandomOrder()
 # print(x)
