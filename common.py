@@ -15,10 +15,27 @@ CURVE = curve_256
 G = generator_256
 ORDER = G.order()
 
-def ECVRF_hash_to_curve(y, alpha):
-    return alpha*G +y
+def ECVRF_hash_to_curve(alpha, Y=None):
+    """Hash an integer in to the target curve
+    
+    Arguments:
+        y  -- An additional input
+        alpha [Int] -- An input integer
+    
+    Returns:
+        alpha * Generator + Y
+    """
+    if Y is None:
+        return alpha * G
+    else:
+        return alpha*G + Y
 
 def ECVRF_hash_points(g, h, y, gamma, gk, hk):
+    """Calculate the hash of many points, used in the VRF
+    
+    Arguments:
+        g, h, y, gamma, gk, hk -- Points on curve
+    """
     ha = SHA256.new()
     ha.update(str(g).encode())
     ha.update(str(h).encode())
@@ -31,24 +48,24 @@ def ECVRF_hash_points(g, h, y, gamma, gk, hk):
 
 
 def I2OSP(x, xLen):
-        if x >= 256**xLen:
-            raise ValueError("integer too large")
-        digits = []
+    if x >= 256**xLen:
+        raise ValueError("integer too large")
+    digits = []
 
-        while x:
-            digits.append(int(x % 256))
-            x //= 256
-        for i in range(xLen - len(digits)):
-            digits.append(0)
-        return digits[::-1]
+    while x:
+        digits.append(int(x % 256))
+        x //= 256
+    for i in range(xLen - len(digits)):
+        digits.append(0)
+    return digits[::-1]
 
 def OS2IP(X):
-        xLen = len(X)
-        X = X[::-1]
-        x = 0
-        for i in range(xLen):
-            x += X[i] * 256^i
-        return x
+    xLen = len(X)
+    X = X[::-1]
+    x = 0
+    for i in range(xLen):
+        x += X[i] * 256^i
+    return x
 
 def EC2OSP(P):
     x = P.x()
@@ -279,7 +296,7 @@ def _to_json(python_object):
         return {'__class__': 'bb_interface.RespAllVote',
                 '__value__': python_object.to_dictionary()}
 
-    raise TypeError(repr(python_object) + ' is not JSON serializable')
+    raise PointError(repr(python_object) + ' is not JSON serializable')
 
 
 def _from_json(json_object):
