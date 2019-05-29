@@ -4,6 +4,7 @@ from ECVRF import ECVRF
 from Crypto.Random import random
 from Crypto.Hash import SHA256
 import PDL_interface
+from Party_interface import *
 
 class Party(object):
     def __init__(self, private_key = None):
@@ -28,7 +29,7 @@ class Party(object):
         out = self.VRF.Prove(T)
         y = out['y']
         pi = out['pi']
-        if beta < Th:
+        if y < Th:
             return True, y, pi
         else:
             return False, None, None
@@ -70,7 +71,7 @@ def KickOff():
 
     sock_to_PDL = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock_to_PDL.connect(config.PDL_ADDR)
-    req = PDL_interface.ReqPubKey()
+    req = PDL_interface.ReqTicket()
     write_message(sock_to_PDL, req)
     resp = read_message(sock_to_PDL)
     print(resp)

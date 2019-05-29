@@ -23,6 +23,21 @@ def KickOff():
         HandleMessage(msg, conn, state)
         conn.close()
 
+def HandlTicketRequest(msg, conn, state):
+    """Handles the request for getting the Threshold. If not existed, return an error.
+    
+    Arguments:
+        msg -- message from the Requester
+        conn -- the connection socket
+        state -- current state of the PDL
+    """
+
+    #If the Threshold has been defined
+    if not state.isExpired and state.currentTicket:
+        common.write_message(conn, RespTicket(state.currentTicket))
+    else:
+        common.write_message(conn, common.RespError("The current ticket has not been defined yet!"))
+
 def HandleMessage(msg, conn, state):
     """Handles received messages as appropriate
     
@@ -39,6 +54,8 @@ def HandleMessage(msg, conn, state):
         HandleThresholdRequest(msg['__value__'], conn, state)
     elif msg['__class__'] == 'ReqPubKey':
         HandlePubKeyRequest(msg['__value__'], conn, state)
+    elif msg['__class__'] == 'ReqTicket':
+        HandlTicketRequest(msg['__value__'], conn, state)
 
 def HandlePubKeyRequest(msg, conn, state):
     """Handles the request for getting the encryption key from requesters. If not existed, return an error.

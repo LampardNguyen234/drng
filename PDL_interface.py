@@ -57,7 +57,7 @@ class ReqThreshold:
 
 class RespThreshold:
     """
-    Response to generate a ticket
+    Response to get the Threshold
     """
     def __init__(self, threshold):
         self.threshold = threshold
@@ -72,6 +72,38 @@ class RespThreshold:
 
     def to_dictionary(self):
         return {'threshold': self.threshold}
+
+class ReqTicket:
+    """
+    Request to get the current ticket
+    """
+    def __repr__(self):
+        return "<ReqTicket: Request for the current ticket>"
+
+    @classmethod
+    def from_dictionary(cls, params):
+        return cls()
+
+    def to_dictionary(self):
+        return {}
+
+class RespTicket:
+    """
+    Response to get the current ticket
+    """
+    def __init__(self, ticket):
+        self.ticket = ticket
+
+    def __repr__(self):
+        return "<RespTicket: ticket: {}>".format(self.ticket)
+
+    @classmethod
+    def from_dictionary(cls, params):
+        ticket = params['ticket']
+        return cls(ticket)
+
+    def to_dictionary(self):
+        return {'ticket': self.ticket}
 
 class ReqPubKey:
     """
@@ -106,3 +138,25 @@ class RespPubKey:
 
     def to_dictionary(self):
         return {'pubkey_X': self.pubkey_X, 'pubkey_Y': self.pubkey_Y}
+
+class ReqContribution:
+    """
+    Party sends a contribution to the PDL
+    """
+    def __init__(self, pubkey_X, pubkey_Y, nonce):
+        self.pubkey_X = pubkey_X
+        self.pubkey_Y = pubkey_Y
+        self.nonce = nonce
+
+    def __repr__(self):
+        return "<ReqGenTick: pubkey: ({}, {}), nonce: {}>".format(self.pubkey_X, self.pubkey_Y, self.nonce)
+
+    @classmethod
+    def from_dictionary(cls, params):
+        pubkeyX = params['pubkey_X']
+        pubkeyY = params['pubkey_Y']
+        nonce = params['nonce']
+        return cls(pubkey_X, pubkey_Y, nonce)
+
+    def to_dictionary(self):
+        return {'pubkey_X': self.pubkey_X, 'pubkey_Y': self.pubkey_Y, 'nonce': self.nonce}

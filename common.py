@@ -17,30 +17,6 @@ CURVE = curve_256
 G = generator_256
 ORDER = G.order()
 
-class PoE(object):
-    def __init__(self, publickKey, T, y, pi):
-        self.publicKey = publickKey
-        self.T = T
-        self.y = y
-        self.pi = pi
-
-class PoC(object):
-    def __init__(self, publicKey, T, C, D, sigma):
-        self.publicKey = publicKey
-        self.T = T
-        self.C = C
-        self.D = D
-        self.sigma = sigma
-    
-    def verify(self):
-        h = SHA256.new()
-        h.update(str(self.C).encode())
-        h.update(str(self.D).encode())
-        h = h.hexdigest()
-        h = int(h, 16)
-
-        return self.publicKey.verify(h, self.sigma)
-
 class RespError:
     """
     represents an error response from the server
@@ -117,9 +93,6 @@ def EC2OSP(P):
     return I2OSP(x, 32) + I2OSP(y, 32)
 
 
-def OS2ECP():
-    pass
-
 def CreatePoint(Px, Py):
     return Point(CURVE, Px, Py)
 
@@ -152,12 +125,6 @@ def VerifyZKP(Y, M, C, D, c, z):
     h.update(str(B1).encode())
 
     return c == int(h.hexdigest(), 16)
-
-def VerifyContribution(publicKey, C, D):
-    pass
-
-def VerifyEligibility(publicKey, T, y, pi, Th):
-    pass
 
 def GenerateTicket(publicKey, nonce):
     h = SHA256.new()
@@ -274,6 +241,12 @@ def _to_json(python_object):
     elif isinstance(python_object, PDL_interface.RespPubKey):
         return  {'__class__': 'RespPubKey',
                  '__value__': python_object.to_dictionary()}
+    elif isinstance(python_object, PDL_interface.ReqTicket):
+        return  {'__class__': 'ReqTicket',
+                 '__value__': python_object.to_dictionary()}
+    elif isinstance(python_object, PDL_interface.RespTicket):
+        return  {'__class__': 'RespTicket',
+                 '__value__': python_object.to_dictionary()}
     
     raise TypeError(repr(python_object) + ' is not JSON serializable')
 
@@ -306,4 +279,10 @@ def _from_json(json_object):
     elif '__class__' in json_object:
         if json_object['__class__'] == 'RespPubKey':
             return PDL_interface.RespPubKey.from_dictionary(json_object['__value__'])
+    elif '__class__' in json_object:
+        if json_object['__class__'] == 'ReqTicket':
+            return PDL_interface.ReqTicket.from_dictionary(json_object['__value__'])
+    elif '__class__' in json_object:
+        if json_object['__class__'] == 'RespTicket':
+            return PDL_interface.RespTicket.from_dictionary(json_object['__value__'])
     return json_object
