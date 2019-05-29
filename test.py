@@ -15,5 +15,7 @@ poc = p.Contribute(T)
 
 print(poc)
 
+print(poc.verify())
+
 # x = RandomOrder()
 # print(x)

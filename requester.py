@@ -3,8 +3,11 @@ from Crypto.Random import random
 
 class Requester(object):
     
-    def __init__(self):
-        self.x = random.randint(1, ORDER)
+    def __init__(self, x=None):
+        if x is None:
+            self.x = RandomOrder()
+        else:
+            self.x = x
         self.Y = self.x * G
         pass
 
@@ -13,7 +16,7 @@ class Requester(object):
 
         D2 = D + (ORDER - 1)*M
 
-        r = random.randint(1, ORDER)
+        r = RandomOrder()
 
         B0 = r*G
         B1 = r*C
@@ -29,4 +32,4 @@ class Requester(object):
 
         z = (r + c*self.x) % ORDER
 
-        return (c,z,B0, B1)
+        return (c,z,B0,B1)

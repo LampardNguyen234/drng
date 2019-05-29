@@ -31,7 +31,13 @@ class PoC(object):
         self.sigma = sigma
     
     def verify(self):
-        pass
+        h = SHA256.new()
+        h.update(str(self.C).encode())
+        h.update(str(self.D).encode())
+        h = h.hexdigest()
+        h = int(h, 16)
+
+        return self.publicKey.verify(h, self.sigma)
 
 
 def ComputeThreshold(k, n, l):    

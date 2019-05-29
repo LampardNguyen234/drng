@@ -66,7 +66,7 @@ class Public_key(object):
   def __str__(self):
     return str(self.point)
 
-  def verifies(self, hash, signature):
+  def verify(self, hash, signature):
     """Verify that signature is a valid signature of hash.
     Return True if the signature is valid.
     """

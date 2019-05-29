@@ -36,3 +36,6 @@ class Party(object):
         sigma = self.private_key.sign(h, RandomOrder())
 
         return PoC(self.public_key, T, C, D, sigma)
+
+    def CheckEligibility(self, T, Th):
+        pass
