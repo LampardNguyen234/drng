@@ -2,20 +2,13 @@ from common import *
 from ecdsa.ecdsa import *
 from Crypto.Hash import SHA256
 from party import Party
+from ECVRF import *
 
 
-x = RandomOrder()
+x = 10
 Y = x*G
-T = GenerateTicket(Y, RandomOrder())
-print(T)
 
-p = Party()
-
-poc = p.Contribute(T)
-
-print(poc)
-
-print(poc.verify())
+print(EC2OSP(Y))
 
 # x = RandomOrder()
 # print(x)

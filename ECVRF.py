@@ -17,37 +17,8 @@ class ECVRF(object):
         k = random.randint(0, ORDER)
         c = ECVRF_hash_points(G,H,self.y,gamma, k*G, k*H)
         s = (k - c*self.x)% ORDER
-        pi = (EC2OSP(gamma), I2OSP(c, 16),  I2OSP(s, 32))
+        pi = {'gamma': gamma, 'c': c,  's': s}
+        beta = SHA256.new(EC2OSP(gamma)).hexdigest()
 
-def ECVRF_hash_to_curve(y, alpha):
-    return G
-
-def ECVRF_hash_points(g, h, y, gamma, gk, hk):
-    return G
-
-def I2OSP(x, xLen):
-        if x >= 256^xLen:
-            raise ValueError("integer too large")
-        digits = []
-
-        while x:
-            digits.append(int(x % 256))
-            x //= 256
-        for i in range(xLen - len(digits)):
-            digits.append(0)
-        return digits[::-1]
-
-def OS2IP(X):
-        xLen = len(X)
-        X = X[::-1]
-        x = 0
-        for i in range(xLen):
-            x += X[i] * 256^i
-        return x
-
-def EC2OSP(x):
-    pass
-
-
-def OS2ECP():
-    pass
+        return {'y': beta, 'pi': pi}
+    

@@ -15,6 +15,51 @@ CURVE = curve_256
 G = generator_256
 ORDER = G.order()
 
+def ECVRF_hash_to_curve(y, alpha):
+    return alpha*G +y
+
+def ECVRF_hash_points(g, h, y, gamma, gk, hk):
+    ha = SHA256.new()
+    ha.update(str(g).encode())
+    ha.update(str(h).encode())
+    ha.update(str(y).encode())
+    ha.update(str(gamma).encode())
+    ha.update(str(gk).encode())
+    ha.update(str(hk).encode())
+
+    return int(ha.hexdigest(), 16) % ORDER
+
+
+def I2OSP(x, xLen):
+        if x >= 256**xLen:
+            raise ValueError("integer too large")
+        digits = []
+
+        while x:
+            digits.append(int(x % 256))
+            x //= 256
+        for i in range(xLen - len(digits)):
+            digits.append(0)
+        return digits[::-1]
+
+def OS2IP(X):
+        xLen = len(X)
+        X = X[::-1]
+        x = 0
+        for i in range(xLen):
+            x += X[i] * 256^i
+        return x
+
+def EC2OSP(P):
+    x = P.x()
+    y = P.y()
+    return I2OSP(x, 32) + I2OSP(y, 32)
+
+
+
+def OS2ECP():
+    pass
+
 class PoE(object):
     def __init__(self, publickKey, T, y, pi):
         self.publicKey = publickKey
