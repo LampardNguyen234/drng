@@ -70,7 +70,6 @@ def HandleThresholdRequest(msg, conn, state):
     else:
         common.write_message(conn, common.RespError("The Threshold has not been defined yet!"))
 
-
 def HandleGenerateTicket(msg, conn, state):
     """Handles the request for generating new ticket from the Requester. If existed, return an error.
     
@@ -112,7 +111,6 @@ class PDLState:
         return "<PDLState: currentThreshold: {}, currentTicket: {}, isExpired : {}, parties: {}, contributors: {}, pubkey: {}>".format(
             hex(self.currentThreshold), hex(self.currentTicket), self.isExpired,
             self.numParty, self.numContributor, self.currentPubKey)
-
 
 if __name__ == "__main__":
     KickOff()
