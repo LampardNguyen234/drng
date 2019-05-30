@@ -60,15 +60,35 @@ This message is sent from the **PDL** to the **Requester** in reply to the reque
 **3. ReqThreshold:** request for the current threshold<br/>
 This message is sent from either the **Requester** or a **Party** to the **PDL** in requesting for the value of the current threshold `Th`. The message has no parameter.
 
-**4. RespThreshold** <br/>
-**5. ReqTicket** <br/>
-**6. RespTicket** <br/>
-**7. ReqPubKey** <br/>
-**8. RespPubKey** <br/>
-**9. ReqContribution** <br/>
-**10. RespContribution** <br/>
-**11. ReqDecryption** <br/>
-**12. RespDecryption** <br/>
+**4. RespThreshold:** response to the **ReqThreshold** <br/>
+This message is sent from the **PDL** to the sender (of the **ReqThreshold**) in reply to the request for the current threshold `Th`. This message consists of the current threshold `Th`.
+
+**5. ReqTicket:** request for the current ticket<br/>
+This message is sent from a **Party** to the **PDL** in requesting for the value of the current ticket `T`. The message has no parameter.
+
+**6. RespTicket:** response to the **ReqTicket**  <br/>
+This message is sent from the **PDL** to the sender (of the **ReqTicket**) in reply to the request for the current ticket `T`. This message consists of: the current threshold `Th`, the current ticket `T`, the public key `Y` of the **Requester**.
+
+**7. ReqPubKey:** request for the public key `Y` of the **Requester**<br/>
+This message is sent from a **Party** to the **PDL** in requesting for the public key `Y` of the **Requester**. The message has no parameter.
+
+**8. RespPubKey:** response to the **ReqPubKey**<br/>
+The message contains the public key of the **Requester**.
+
+**9. ReqContribution:** request to make a contribution<br/>
+This message is sent from a **Party** to the **PDL** for making a contribution with respect to the current ticket `T`. The message consists of a `PoC`.
+
+**10. RespContribution:** response to the **ReqContribution**<br/>
+This message is a reply from the **PDL** to a **Party** for acknowledging his contribution.
+
+**11. ReqDecryption:** request to get the decrypted of a contribution <br/>
+This message is sent from the **PDL** to the **Requester** to request for a decryption value of a tallied contribution. The message contains the tallied contribution `(C, D)`.
+
+**12. RespDecryption:** response to the **ReqDecryption** <br/>
+This message is a reply from the **Requester** to the **PDL** containing a decrypted `M` and a proof `(c, z)` for proper decryption.
+
+**13. RespError**
+This indicates an error has occurred.
 
 ## Authors
 * Lampard (lnhatthanh.nguyen@gmail.com)
