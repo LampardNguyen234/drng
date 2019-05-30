@@ -36,7 +36,7 @@ def handle_message(msg, conn, state):
         state -- current state of the PDL
     """
 
-    print("Received a new message: {}".format(msg))
+    print("Received a new message: {} from {}".format(msg['__value__'], conn.getpeername()))
     if msg['__class__'] == 'ReqGenTick':
         handle_generate_ticket(msg['__value__'], conn, state)
     elif msg['__class__'] == 'ReqThreshold':

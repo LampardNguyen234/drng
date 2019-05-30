@@ -47,9 +47,7 @@ class Party(object):
         eligible, y, pi = self.check_eligibility(T, Th)
         
         if eligible:
-            # Y = get_public_key_from_requester()
-            # x = random_order()
-            x = 1
+            x = random_order()
             M = x*G
 
             print("Your contribution is: {}".format(M))

@@ -9,7 +9,7 @@ NUM_PARTIES = 10
 EXPECTED_NUM_CONTRIBUTORS = 5
 
 '''The address of the PDL'''
-PDL_ADDR = ("localhost", 1025)
+PDL_ADDR = ("localhost", 1026)
 
 '''The address of the Requester'''
-REQUESTER_ADDR = ("localhost", 2049)
+REQUESTER_ADDR = ("localhost", 2048)
