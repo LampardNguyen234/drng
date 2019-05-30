@@ -21,7 +21,7 @@ In this stage, the **Requester** uses his `private key` to decrypt the tallied c
 
 
 ## Setup
-The project was written using Python 3 To install dependencies (prcryptodome for windows or pycrypto for ubuntu, etc), change to root project directory (the one containing _requirements.txt_) and run:
+The project was written using Python 3 To install dependencies (*prcryptodome* for windows or *pycrypto* for ubuntu, etc), change to root project directory (the one containing _requirements.txt_) and run:
 
 ```bash
 pip3 install -r requirements.txt
