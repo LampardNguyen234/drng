@@ -8,7 +8,7 @@ import socket
 
 import config
 from Crypto.Hash import SHA256
-from ecdsa.ecdsa import curve_256, generator_256, Signature
+from ecdsa.ecdsa import curve_256, generator_256, Signature, Public_key
 from ecdsa.ellipticcurve import Point
 from Crypto.Random import random
 import PDL_interface
@@ -93,7 +93,7 @@ def EC2OSP(P):
     return I2OSP(x, 32) + I2OSP(y, 32)
 
 
-def CreatePoint(Px, Py):
+def CreatePointFromXY(Px, Py):
     return Point(CURVE, Px, Py)
 
 
@@ -135,8 +135,11 @@ def GenerateTicket(publicKey, nonce):
 def RandomOrder():
     return random.randint(0, ORDER)
 
-def CreateSignature(r, s):
+def CreateSignatureFromrs(r, s):
     return Signature(r,s)
+
+def CreatePublicKeyFromPoint(P):
+    return Public_key(G, P)
 
 def egcd(a, b):
     if a == 0:

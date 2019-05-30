@@ -91,19 +91,21 @@ class RespTicket:
     """
     Response to get the current ticket
     """
-    def __init__(self, ticket):
+    def __init__(self, ticket, threshold):
         self.ticket = ticket
+        self.threshold = threshold
 
     def __repr__(self):
-        return "<RespTicket: ticket: {}>".format(self.ticket)
+        return "<RespTicket: ticket: {}, threshold: {}>".format(self.ticket, self.threshold)
 
     @classmethod
     def from_dictionary(cls, params):
         ticket = params['ticket']
-        return cls(ticket)
+        threshold = params['threshold']
+        return cls(ticket, threshold)
 
     def to_dictionary(self):
-        return {'ticket': self.ticket}
+        return {'ticket': self.ticket, 'threshold': self.threshold}
 
 class ReqPubKey:
     """
@@ -147,9 +149,9 @@ class ReqContribution:
         self.pubkey_X = pubkey_X
         self.pubkey_Y = pubkey_Y
         self.C_X = C_X
-        self.C_Y = C_X
+        self.C_Y = C_Y
         self.D_X = D_X
-        self.D_Y = CD_X
+        self.D_Y = D_Y
         self.sigma_r = sigma_r
         self.sigma_s = sigma_s
         

@@ -56,19 +56,19 @@ def HandleContribution(msg, conn, state):
 
     #If the Threshold has been defined
     if not state.isExpired:
-        pubkey_X = params['pubkey_X']
-        pubkey_Y = params['pubkey_Y']
-        C_X = params['C_X']
-        C_Y = params['C_Y']
-        D_X = params['D_X']
-        D_Y = params['D_Y']
-        sigma_r = params['sigma_r']
-        sigma_s = params['sigma_s']
+        pubkey_X = msg['pubkey_X']
+        pubkey_Y = msg['pubkey_Y']
+        C_X = msg['C_X']
+        C_Y = msg['C_Y']
+        D_X = msg['D_X']
+        D_Y = msg['D_Y']
+        sigma_r = msg['sigma_r']
+        sigma_s = msg['sigma_s']
 
-        C = common.CreatePoint(C_X, C_Y)
-        D = common.CreatePoint(D_X, D_Y)
-        pubkey = common.CreatePoint(pubkey_X, pubkey_Y)
-        sigma = common.CreateSignature(sigma_r, sigma_s)
+        C = common.CreatePointFromXY(C_X, C_Y)
+        D = common.CreatePointFromXY(D_X, D_Y)
+        pubkey = common.CreatePublicKeyFromPoint(common.CreatePointFromXY(pubkey_X, pubkey_Y))
+        sigma = common.CreateSignatureFromrs(sigma_r, sigma_s)
         poc = PoC(pubkey, state.currentTicket, C, D, sigma)
 
         if poc.verify():
@@ -98,7 +98,7 @@ def HandleTicketRequest(msg, conn, state):
 
     #If the ticket has been defined
     if not state.isExpired and state.currentTicket:
-        common.write_message(conn, RespTicket(state.currentTicket))
+        common.write_message(conn, RespTicket(state.currentTicket, state.currentThreshold))
     else:
         common.write_message(conn, common.RespError("The current ticket has not been defined yet!"))
 
@@ -147,7 +147,7 @@ def HandleGenerateTicket(msg, conn, state):
 
         pubkey_X = msg['pubkey_X']
         pubkey_Y = msg['pubkey_Y']
-        pubkey = common.CreatePoint(pubkey_X, pubkey_Y)
+        pubkey = common.CreatePointFromXY(pubkey_X, pubkey_Y)
 
         nonce = msg['nonce']
         state.currentTicket = common.GenerateTicket(pubkey, nonce)

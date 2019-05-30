@@ -71,26 +71,35 @@ def KickOff():
 
     sock_to_PDL = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock_to_PDL.connect(config.PDL_ADDR)
-    req = PDL_interface.ReqThreshold()
+    req = PDL_interface.ReqTicket()
     write_message(sock_to_PDL, req)
     resp = read_message(sock_to_PDL)
     if isinstance(resp, RespError):
         print(resp)
     elif resp['__class__'] == 'RespTicket':
         T = resp['__value__']['ticket']
-        print(T)
-        req = PDL_interface.ReqThreshold()
-        write_message(sock_to_PDL, req)
-        resp = read_message(sock_to_PDL)
-        print(resp)
         Th = resp['__value__']['threshold']
-
         print(T, Th)
 
         Y = 10 * G
-        poc, poe = party.Contribute(T, Th, Y)
+        poe, poc = party.Contribute(T, Th, Y)
 
-        print(poe, poc)
+        if poc is None:
+            print("You are not eligible to contribute!")
+        else:
+            resp = Send_PoC(poc)
+            print(resp)
+
+def Send_PoC(poc):
+    sock_to_PDL = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock_to_PDL.connect(config.PDL_ADDR)
+    req = PDL_interface.ReqContribution(poc.publicKey.point.x(), poc.publicKey.point.y(),
+                                        poc.C.x(), poc.C.y(),
+                                        poc.D.x(), poc.D.y(),
+                                        poc.sigma.r, poc.sigma.s)
+    write_message(sock_to_PDL, req)
+    resp = read_message(sock_to_PDL)
+    return resp
 
 if __name__ == '__main__':
     KickOff()
