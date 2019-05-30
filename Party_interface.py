@@ -1,5 +1,5 @@
 from Crypto.Hash import SHA256
-
+import common
 class PoE(object):
     def __init__(self, publickKey, T, y, pi):
         self.publicKey = publickKey
@@ -9,10 +9,17 @@ class PoE(object):
     
     @classmethod
     def from_dictionary(cls, params):
-        return cls()
+        pubkey_X = params['pubkey_X']
+        pubkey_Y = params['pubkey_Y']
+        T = params['T']
+        y = params['y']
+        pi = params['pi']
+        pubkey = common.CreatePublicKeyFromPoint(common.CreatePointFromXY(pubkey_X, pubkey_Y))
+        return cls(pubkey, T, y, pi)
 
     def to_dictionary(self):
-        return {}
+        return {'pubkey_X': self.publicKey.point.x(), 'pubkey_Y': self.publicKey.point.y(), 'T': self.T,
+        'y': y, 'pi': pi}
 
 
 class PoC(object):
@@ -31,3 +38,20 @@ class PoC(object):
         h = int(h, 16)
 
         return self.publicKey.verify(h, self.sigma)
+    
+    @classmethod
+    def from_dictionary(cls, params):
+        pubkey = params['pubkey']
+        pubkey_X = pubkey['x']
+        pubkey_Y = pubkey['y']
+        pubkey = common.CreatePublicKeyFromPoint(common.CreatePointFromXY(pubkey_X, pubkey_Y))
+
+        T = params['T']
+        y = params['y']
+        pi = params['pi']
+        pubkey = common.CreatePublicKeyFromPoint(common.CreatePointFromXY(pubkey_X, pubkey_Y))
+        return cls(pubkey, T, y, pi)
+
+    def to_dictionary(self):
+        return {'pubkey': self.publicKey.point.to_dictionary(), 'T': self.T,
+        'C': C.to_dictionary(), 'D': D.to_dictionary(), 'sigma': sigma.to_dictionary()}

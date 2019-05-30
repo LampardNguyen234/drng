@@ -1,9 +1,11 @@
 from PDL_interface import *
 import socket
 import common
+import networkHandling
 import config
 from Party_interface import PoC, PoE
 from Crypto.Random import random
+import Requester_interface
 
 def KickOff():
     """Kicks off the PDL. Creates/binds a socket and starts listening for any requests.
@@ -18,7 +20,7 @@ def KickOff():
 
     while True:
         conn, addr = sock.accept()
-        msg = common.read_message(conn)
+        msg = networkHandling.read_message(conn)
         if not msg:
             conn.close()
             continue
@@ -79,13 +81,20 @@ def HandleContribution(msg, conn, state):
             else:
                 state.currentC = state.currentC + C
                 state.currentD = state.currentD + D
-            common.write_message(conn, RespContribution("Contribution success!"))
+            networkHandling.write_message(conn, RespContribution("Contribution success!"))
+            if state.numContributor == state.numParty:
+                print("Contribution complete!")
+                sock_to_req = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                sock_to_req.connect(config.REQUESTER_ADDR)
+                req = Requester_interface.ReqDecryption(state.currentC, state.currentD)
+                networkHandling.write_message(sock_to_req, req)
+                resp = networkHandling.read_message(sock_to_req)
+                print("The final outcome is: {}".format(resp['__value__']['M']))
         else:
-            common.write_message(conn, common.RespError("The PoC cannot be verified!"))
+            networkHandling.write_message(conn, networkHandling.RespError("The PoC cannot be verified!"))
 
     else:
-        common.write_message(conn, common.RespError("Contribution is not open or has been closed!"))
-
+        networkHandling.write_message(conn, networkHandling.RespError("Contribution is not open or has been closed!"))
 
 def HandleTicketRequest(msg, conn, state):
     """Handles the request for getting the ticket. If not existed, return an error.
@@ -98,9 +107,12 @@ def HandleTicketRequest(msg, conn, state):
 
     #If the ticket has been defined
     if not state.isExpired and state.currentTicket:
-        common.write_message(conn, RespTicket(state.currentTicket, state.currentThreshold))
+        networkHandling.write_message(conn, RespTicket(state.currentTicket, state.currentThreshold, state.currentPubKey))
     else:
-        common.write_message(conn, common.RespError("The current ticket has not been defined yet!"))
+        networkHandling.write_message(conn, networkHandling.RespError("The current ticket has not been defined yet!"))
+
+def HandleDecryption(msg, conn, state):
+    pass
 
 def HandlePubKeyRequest(msg, conn, state):
     """Handles the request for getting the encryption key from requesters. If not existed, return an error.
@@ -113,9 +125,9 @@ def HandlePubKeyRequest(msg, conn, state):
 
     #If the Threshold has been defined
     if state.currentPubKey:
-        common.write_message(conn, RespPubKey(state.currentPubKey))
+        networkHandling.write_message(conn, RespPubKey(state.currentPubKey))
     else:
-        common.write_message(conn, common.RespError("The Requester has not connected yet!"))
+        networkHandling.write_message(conn, networkHandling.RespError("The Requester has not connected yet!"))
 
 def HandleThresholdRequest(msg, conn, state):
     """Handles the request for getting the Threshold. If not existed, return an error.
@@ -128,9 +140,9 @@ def HandleThresholdRequest(msg, conn, state):
 
     #If the Threshold has been defined
     if state.currentThreshold:
-        common.write_message(conn, RespThreshold(state.currentThreshold))
+        networkHandling.write_message(conn, RespThreshold(state.currentThreshold))
     else:
-        common.write_message(conn, common.RespError("The Threshold has not been defined yet!"))
+        networkHandling.write_message(conn, networkHandling.RespError("The Threshold has not been defined yet!"))
 
 def HandleGenerateTicket(msg, conn, state):
     """Handles the request for generating new ticket from the Requester. If existed, return an error.
@@ -153,9 +165,9 @@ def HandleGenerateTicket(msg, conn, state):
         state.currentTicket = common.GenerateTicket(pubkey, nonce)
         state.currentPubKey = pubkey
         print("State", state)
-        common.write_message(conn, RespGenTick(state.currentTicket))
+        networkHandling.write_message(conn, RespGenTick(state.currentTicket))
     else:
-        common.write_message(conn, common.RespError("The current ticket has not been expired yet!"))
+        networkHandling.write_message(conn, networkHandling.RespError("The current ticket has not been expired yet!"))
 
 class PDLState:
     """
@@ -165,9 +177,9 @@ class PDLState:
         self.currentThreshold = common.ComputeThreshold(config.EXPECTED_NUM_CONTRIBUTORS, 
                                                         config.NUM_PARTIES,
                                                         256)
-        self.currentTicket = common.GenerateTicket(10*common.G, 100)
-        self.isExpired = False
-        self.numParty = 0
+        self.currentTicket = None
+        self.isExpired = True
+        self.numParty = 1
         self.numContributor = 0
         self.currentPubKey = None
         self.currentC = None

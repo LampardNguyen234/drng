@@ -1,7 +1,9 @@
 from common import *
+from networkHandling import *
 from Crypto.Random import random
 import config
 import PDL_interface
+from Requester_interface import *
 
 class Requester(object):
     
@@ -34,7 +36,7 @@ class Requester(object):
 
         z = (r + c*self.x) % ORDER
 
-        return (c,z,B0,B1)
+        return (M, c, z, B0, B1)
 
 def KickOff():
     requester = Requester()
@@ -44,7 +46,35 @@ def KickOff():
     req = PDL_interface.ReqGenTick(requester.Y.x(), requester.Y.y(), random.randint(0, 2**256))
     write_message(sock_to_PDL, req)
     resp = read_message(sock_to_PDL)
+    
     print(resp)
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind(config.REQUESTER_ADDR)
+    sock.listen()
+
+    while True:
+        conn, addr = sock.accept()
+        msg = read_message(conn)
+        if not msg:
+            conn.close()
+            continue
+        HandleMessage(msg, conn, requester)
+        conn.close()
+
+def HandleMessage(msg, conn, requester):
+    print("Received a new message: {}".format(msg))
+    if msg['__class__'] == 'ReqDecryption':
+        msg = msg['__value__']
+        C = msg['C']
+        D = msg['D']
+        C = CreatePointFromXY(C['x'], C['y'])
+        D = CreatePointFromXY(D['x'], D['y'])
+        out = requester.decrypt(C, D)
+        print(out)
+
+        req = RespDecryption(out[0], out[1], out[2], out[3], out[4])
+        write_message(conn, req)
 
 if __name__ == '__main__':
     KickOff()

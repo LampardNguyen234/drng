@@ -32,7 +32,7 @@ pip3 install -r requirements.txt
     python3 Party.py
     ```
 
-###Message Type
+### Message Type
 1. ReqGenTick
 2. RespGenTick
 3. ReqThreshold

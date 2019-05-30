@@ -1,4 +1,5 @@
 from common import *
+from networkHandling import *
 from ecdsa.ecdsa import Private_key, Public_key
 from ECVRF import ECVRF
 from Crypto.Random import random
@@ -50,6 +51,8 @@ class Party(object):
             x = RandomOrder()
             M = x*G
 
+            print("Your contribution is: {}".format(M))
+
             k = RandomOrder()
             C = k*G
             D = k*Y + M
@@ -79,9 +82,10 @@ def KickOff():
     elif resp['__class__'] == 'RespTicket':
         T = resp['__value__']['ticket']
         Th = resp['__value__']['threshold']
-        print(T, Th)
+        Y = resp['__value__']['pubkey']
+        Y = CreatePointFromXY(Y['x'], Y['y'])
+        print(T, Th, Y)
 
-        Y = 10 * G
         poe, poc = party.Contribute(T, Th, Y)
 
         if poc is None:

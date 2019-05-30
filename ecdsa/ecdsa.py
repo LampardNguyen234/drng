@@ -13,6 +13,9 @@ class Signature(object):
   def __init__(self, r, s):
     self.r = r
     self.s = s
+  
+  def to_dictionary(self):
+    return {'r':r, 's':s}
 
   def recover_public_keys(self, hash, generator):
     """Returns two public keys for which the signature is valid
