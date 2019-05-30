@@ -1,15 +1,21 @@
 # Distributed random number generation based on homomorphic encryption
 This repo is a proof of concept of our work on scalable distributed random number generation based on 
-ElGamal homomorphic encryption on Elliptic Curves (ECC). This proposed protocol is the very first one that utilizes homomorphic encryption as the building block for generating random numbers on distributed environments.
+ElGamal homomorphic encryption on Elliptic Curves (ECC). Please follow this [link](https://github.com/LampardNguyen234/drng) to get the latest update about the project.
+This proposed protocol is the very first one that utilizes homomorphic encryption as the building block for generating random numbers on distributed environments.
 The protocol operates in rounds, each round will produce a random beacon (with high probability). Each round consists of the following stages (we assume that all parties are known beforehand):
+
 1.  **Initialization** <br/>
 In this stage, the **Requester** who is in need of random numbers sends a requester containing his `public key` and a `nonce` to the **PDL** (message type: **ReqGenTick**). A ticket `T` is the created by hashing the `public key` and the `nonce`; and sent back to the **Requester** (message type: **RespGenTick**). This marks the beginning of the round.
+
 2. **Eligibility Checking:** <br/>
 In this stage, each **Party** checks his eligibility for contributing to generating the random number with respect to the ticket `T`. Each **Party** runs the VRF `Proving` function and compares the output `y` to the globally-predetermined threshold `Th`. If `y < Th`, he generates a proof for his eligibility `PoE = <T, y , pi>` (see `Party_interface.py`) and proceeds to the next stage (after publishing the `PoE` onto the **PDL**).
+
 3. **Contribution Making** <br/>
 An eligible **Party**, also called a **Contributor**, chooses a point `M` on the elliptic curve of his choice to contribute. Then he encrypts this `M` (and gets the ciphertex `(C, D)`) using the public key of the **Requester** (see `Party.py`). He also generates a proof for his contribution consisting of the form `PoC = <T, C, D, sigma>` where `(C, D) = Enc(M)` and `sigma` is the signature of the party on `Hash(C,D)`. This `PoC` is the publicized onto the **PDL**. (message type: **ReqContribution**).
+
 4. **Contribution Tallying** <br/>
 The **PDL** keeps track of all contributions from the **Parties**. When the **PDL** receives a contribution from a **party**, it will automatically add this contribution to the total sum (after verifying the correctness of the received `PoC`). This is possible thanks to the homomorphic property of the ElGamal encryption on Elliptic Curves. When all **party** have finished the third stage, the **PDL** sends a request to the **Requster** along with the final tallied contribution for decryption. (message type: **ReqDecryption**).
+
 5. **Result Decryption** <br/>
 In this stage, the **Requester** uses his `private key` to decrypt the tallied contribution and gets `M` as the sum of all contributions. He also generates a proof for his proper decrytion `(c, z)` using Zero-knowledge proof technique. He then publicizes `(M, c, z)` onto the **PDL**. (message type: **RespDecryption**).
 
