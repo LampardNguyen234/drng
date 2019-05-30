@@ -32,6 +32,18 @@ pip3 install -r requirements.txt
     python3 Party.py
     ```
 
+###Message Type
+1. ReqGenTick
+2. RespGenTick
+3. ReqThreshold
+4. RespThreshold
+5. ReqTicket
+6. RespTicket
+7. ReqPubKey
+8. RespPubKey
+9. ReqContribution
+10. RespContribution
+
 ## Authors
 * Lampard (lnhatthanh.nguyen@gmail.com)
 
