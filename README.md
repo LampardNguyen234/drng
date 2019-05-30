@@ -51,9 +51,15 @@ pip3 install -r requirements.txt
     ```
 
 ## Message Type
-**1. ReqGenTick** <br/>
-**2. RespGenTick** <br/>
-**3. ReqThreshold** <br/>
+**1. ReqGenTick:** request for generating new ticket `T`. <br/>
+This message is sent from the **Requester** to the **PDL**. The message consists of a public key `Y` and a `nonce`. If the current ticket is expired or has not been created yet, a new ticket will be created.
+
+**2. RespGenTick:** response to the **ReqGenTick** <br/>
+This message is sent from the **PDL** to the **Requester** in reply to the request from the **Requester** for generating new ticket. This message consists of the newly-created ticket.
+
+**3. ReqThreshold:** request for the current threshold<br/>
+This message is sent from either the **Requester** or a **Party** to the **PDL** in requesting for the value of the current threshold `Th`. The message has no parameter.
+
 **4. RespThreshold** <br/>
 **5. ReqTicket** <br/>
 **6. RespTicket** <br/>
