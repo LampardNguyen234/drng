@@ -57,6 +57,9 @@ class Party(object):
             C = k*G
             D = k*Y + M
 
+            print("C =", C)
+            print("D =", D)
+
             h = SHA256.new()
             h.update(str(C).encode())
             h.update(str(D).encode())
@@ -97,10 +100,7 @@ def KickOff():
 def Send_PoC(poc):
     sock_to_PDL = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock_to_PDL.connect(config.PDL_ADDR)
-    req = PDL_interface.ReqContribution(poc.publicKey.point.x(), poc.publicKey.point.y(),
-                                        poc.C.x(), poc.C.y(),
-                                        poc.D.x(), poc.D.y(),
-                                        poc.sigma.r, poc.sigma.s)
+    req = PDL_interface.ReqContribution(poc.publicKey.point, poc.C, poc.D, poc.sigma.r, poc.sigma.s)
     write_message(sock_to_PDL, req)
     resp = read_message(sock_to_PDL)
     return resp

@@ -1,3 +1,4 @@
+import common
 """
 Contains request and response objects for Public Distributed Ledger (PDL)
 """
@@ -147,36 +148,39 @@ class ReqContribution:
     """
     Party sends a contribution to the PDL
     """
-    def __init__(self, pubkey_X, pubkey_Y, C_X, C_Y, D_X, D_Y, sigma_r, sigma_s):
-        self.pubkey_X = pubkey_X
-        self.pubkey_Y = pubkey_Y
-        self.C_X = C_X
-        self.C_Y = C_Y
-        self.D_X = D_X
-        self.D_Y = D_Y
+    def __init__(self, pubkey, C, D, sigma_r, sigma_s):
+        self.pubkey = pubkey
+        self.C = C
+        self.D = D
         self.sigma_r = sigma_r
         self.sigma_s = sigma_s
         
 
     def __repr__(self):
-        return "<ReqContribution: pubkey: ({}, {}), C: ({}, {}), D:({}, {}), sigma: ({}, {})>".format(
-            self.pubkey_X, self.pubkey_Y, self.C_X, self.C_Y, self.D_X, self.D_Y, self.sigma_r, self.sigma_s)
+        return "<ReqContribution: pubkey: {}, C: {}, D: {}, sigma: ({}, {})>".format(
+            self.pubkey, self.C.to_dictionary(), self.D.to_dictionary(), self.sigma_r, self.sigma_s)
 
     @classmethod
     def from_dictionary(cls, params):
-        pubkey_X = params['pubkey_X']
-        pubkey_Y = params['pubkey_Y']
-        C_X = params['C_X']
-        C_Y = params['C_Y']
-        D_X = params['D_X']
-        D_Y = params['D_Y']
+        pubkey_X = params['pubkey']['x']
+        pubkey_Y = params['pubkey']['y']
+        pubkey = common.CreatePointFromXY(pubkey_X, pubkey_Y)
+
+        C_X = params['C']['x']
+        C_Y = params['C']['y']
+        C = common.CreatePointFromXY(C_X, C_Y)
+
+        D_X = params['D']['x']
+        D_Y = params['D']['y']
+        D = common.CreatePointFromXY(D_X, D_Y)
+
         sigma_r = params['sigma_r']
         sigma_s = params['sigma_s']
-        return cls(pubkey_X, pubkey_Y, C_X, C_Y, D_X, D_Y, sigma_r, sigma_s)
+        return cls(pubkey, C, D, sigma_r, sigma_s)
 
     def to_dictionary(self):
-        return {'pubkey_X': self.pubkey_X, 'pubkey_Y': self.pubkey_Y, 'C_X': self.C_X, 'C_Y': self.C_Y,
-        'D_X': self.D_X, 'D_Y': self.D_Y, 'sigma_r': self.sigma_r, 'sigma_s': self.sigma_s}
+        return {'pubkey': self.pubkey.to_dictionary(), 'C': self.C.to_dictionary(), 
+        'D': self.D.to_dictionary(), 'sigma_r': self.sigma_r, 'sigma_s': self.sigma_s}
 
 class RespContribution:
     def __init__(self, msg):

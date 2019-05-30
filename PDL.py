@@ -58,18 +58,25 @@ def HandleContribution(msg, conn, state):
 
     #If the Threshold has been defined
     if not state.isExpired:
-        pubkey_X = msg['pubkey_X']
-        pubkey_Y = msg['pubkey_Y']
-        C_X = msg['C_X']
-        C_Y = msg['C_Y']
-        D_X = msg['D_X']
-        D_Y = msg['D_Y']
+        pubkey_X = msg['pubkey']['x']
+        pubkey_Y = msg['pubkey']['y']
+        pubkey = common.CreatePointFromXY(pubkey_X, pubkey_Y)
+
+        C_X = msg['C']['x']
+        C_Y = msg['C']['y']
+        C = common.CreatePointFromXY(C_X, C_Y)
+
+        D_X = msg['D']['x']
+        D_Y = msg['D']['y']
+        D = common.CreatePointFromXY(D_X, D_Y)
+
+        print("C =", C)
+        print("D =", D)
+
         sigma_r = msg['sigma_r']
         sigma_s = msg['sigma_s']
 
-        C = common.CreatePointFromXY(C_X, C_Y)
-        D = common.CreatePointFromXY(D_X, D_Y)
-        pubkey = common.CreatePublicKeyFromPoint(common.CreatePointFromXY(pubkey_X, pubkey_Y))
+        pubkey = common.CreatePublicKeyFromPoint(pubkey)
         sigma = common.CreateSignatureFromrs(sigma_r, sigma_s)
         poc = PoC(pubkey, state.currentTicket, C, D, sigma)
 
@@ -84,12 +91,24 @@ def HandleContribution(msg, conn, state):
             networkHandling.write_message(conn, RespContribution("Contribution success!"))
             if state.numContributor == state.numParty:
                 print("Contribution complete!")
+
                 sock_to_req = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock_to_req.connect(config.REQUESTER_ADDR)
                 req = Requester_interface.ReqDecryption(state.currentC, state.currentD)
                 networkHandling.write_message(sock_to_req, req)
+                
                 resp = networkHandling.read_message(sock_to_req)
-                print("The final outcome is: {}".format(resp['__value__']['M']))
+                resp = resp['__value__']
+                
+                M = resp['M']
+                c = resp['c']
+                z = resp['z']
+
+                M = common.CreatePointFromXY(M['x'], M['y'])
+
+                if common.VerifyZKP(state.currentPubKey, M, state.currentC, state.currentD, c, z):
+                    print("The final outcome is: {}".format(M))
+                    exit()
         else:
             networkHandling.write_message(conn, networkHandling.RespError("The PoC cannot be verified!"))
 

@@ -14,6 +14,9 @@ class Requester(object):
             self.x = x
         self.Y = self.x * G
         pass
+    
+    def __repr__(self):
+        return "<Requester: privkey: {}, pubkey: {}>".format(self.x, self.Y)
 
     def decrypt(self, C, D):
         M = D + (ORDER-self.x)*C
@@ -36,10 +39,12 @@ class Requester(object):
 
         z = (r + c*self.x) % ORDER
 
-        return (M, c, z, B0, B1)
+        return (M, c, z)
 
 def KickOff():
     requester = Requester()
+
+    print(requester)
     
     sock_to_PDL = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock_to_PDL.connect(config.PDL_ADDR)
@@ -70,10 +75,12 @@ def HandleMessage(msg, conn, requester):
         D = msg['D']
         C = CreatePointFromXY(C['x'], C['y'])
         D = CreatePointFromXY(D['x'], D['y'])
+        print("C =", C)
+        print("D =", D)
         out = requester.decrypt(C, D)
         print(out)
 
-        req = RespDecryption(out[0], out[1], out[2], out[3], out[4])
+        req = RespDecryption(out[0], out[1], out[2])
         write_message(conn, req)
 
 if __name__ == '__main__':

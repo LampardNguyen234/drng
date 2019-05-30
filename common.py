@@ -87,7 +87,7 @@ def TallyContribute(C, D):
 def VerifyZKP(Y, M, C, D, c, z):
     B0 = z*G + (ORDER - c)*Y
     D2 = D + (ORDER - 1)*M
-    B1 = z*C + (ORDER - c)* D2
+    B1 = z*C + (ORDER - c)*D2
 
     h = SHA256.new()
     h.update(str(Y).encode())

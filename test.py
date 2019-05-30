@@ -1,14 +1,20 @@
 from common import *
 from ecdsa.ecdsa import *
 from Crypto.Hash import SHA256
-from party import Party
 from ECVRF import ECVRF
+from Requester import Requester
 
+r = Requester()
 
-p = Party()
+X = random.randint(0, 2**254)*G
+Y = r.Y
 
-x = p.VRF.Prove(10)
+print("X =", X)
+k = random.randint(0, 2**254)
+C = k*G
+D = k*Y + X 
 
-print (ECVRF.Verify(10, x['pi'], x['pk']))
+M = r.decrypt(C, D)
+print("M =", VerifyZKP(Y, M[0], C, D, M[1], M[2]))
 # x = RandomOrder()
 # print(x)

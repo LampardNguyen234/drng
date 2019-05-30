@@ -16,14 +16,12 @@ class ReqDecryption(object):
         return cls(C, D)
 
     def to_dictionary(self):
-        return {'C': self.C.to_dictionary(), 'D': self.C.to_dictionary()}
+        return {'C': self.C.to_dictionary(), 'D': self.D.to_dictionary()}
 
 
 class RespDecryption(object):
-    def __init__(self, M, c, z, B0, B1):
+    def __init__(self, M, c, z):
         self.M = M
-        self.B0 = B0
-        self.B1 = B1
         self.c = c
         self.z = z
     
@@ -31,19 +29,12 @@ class RespDecryption(object):
     def from_dictionary(cls, params):
         M_X = params['M']['x']
         M_Y = params['M']['y']
-        B0_X = params['B0']['x']
-        B0_Y = params['B0']['y']
-        B1_X = params['B1']['x']
-        B1_Y = params['B1']['y']
         c = params['c']
         z = params['z']
 
         M = common.CreatePointFromXY(M_X, M_Y)
-        B0 = common.CreatePointFromXY(B0_X, B0_Y)
-        B1 = common.CreatePointFromXY(B1_X, B1_Y)
 
-        return cls(M, c, z, B0, B1)
+        return cls(M, c, z)
 
     def to_dictionary(self):
-        return {'M': self.M.to_dictionary(), 'B0': self.B0.to_dictionary(),
-        'B1': self.B1.to_dictionary(), 'c': self.c, 'z': self.z}
+        return {'M': self.M.to_dictionary(), 'c': self.c, 'z': self.z}
