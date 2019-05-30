@@ -33,7 +33,7 @@ pip3 install -r requirements.txt
 
 **Note:** You can modify the number of parties, expected number of contributors and other information in `config.py`.
 
-1. Run PDL, Requester and Party in respective order.
+Run PDL, Requester and Party in respective order.
 
     ```bash
     # in Terminal 1 (PDL)
@@ -46,7 +46,7 @@ pip3 install -r requirements.txt
     ```
     
     ```bash
-    # in Terminal 3 (Party)
+    # in Terminal 3 (Party). You can run this command many times indicating that there are many parties.
     python3 Party.py
     ```
 
