@@ -30,13 +30,13 @@ def kick_off():
 def handle_message(msg, conn, state):
     """Handles received messages as appropriate
     
-    Arguments:
+    Arguments:\n
         msg -- received message
         conn -- the connection socket
         state -- current state of the PDL
     """
 
-    print("Received a new message: {} from {}".format(msg['__value__'], conn.getpeername()))
+    print("\nReceived a new message: {} from {}".format(msg['__value__'], conn.getpeername()))
     if msg['__class__'] == 'ReqGenTick':
         handle_generate_ticket(msg['__value__'], conn, state)
     elif msg['__class__'] == 'ReqThreshold':
@@ -50,7 +50,8 @@ def handle_message(msg, conn, state):
 
 def handle_contribution(msg, conn, state):
     """Handles contribution from party.
-    Arguments:
+
+    Arguments:\n
         msg -- message from the Requester
         conn -- the connection socket
         state -- current state of the PDL
@@ -62,8 +63,8 @@ def handle_contribution(msg, conn, state):
         C = common.EC_point_from_JSON(msg['C'])
         D = common.EC_point_from_JSON(msg['D'])
 
-        print("C =", C)
-        print("D =", D)
+        print("\nNew contribution received:")
+        print("C = {}\nD = {}".format(C, D))
 
         sigma_r = msg['sigma_r']
         sigma_s = msg['sigma_s']
@@ -82,7 +83,7 @@ def handle_contribution(msg, conn, state):
                 state.currentD = state.currentD + D
             network_handling.write_message(conn, RespContribution("Contribution success!"))
             if state.numContributor == state.numParty:
-                print("Contribution complete!")
+                print("\nContribution complete!")
 
                 sock_to_req = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock_to_req.connect(config.REQUESTER_ADDR)
@@ -99,8 +100,10 @@ def handle_contribution(msg, conn, state):
                 M = common.EC_point_from_JSON(M)
 
                 if common.verify_ZKP(state.currentPubKey, M, state.currentC, state.currentD, c, z):
-                    print("The final outcome is: {}".format(M))
+                    print("\nThe final outcome is:\n{}".format(M))
                     exit()
+                else:
+                    print("\nVerifying ZKP failed!!!")
         else:
             network_handling.write_message(conn, network_handling.RespError("The PoC cannot be verified!"))
 
@@ -108,9 +111,9 @@ def handle_contribution(msg, conn, state):
         network_handling.write_message(conn, network_handling.RespError("Contribution is not open or has been closed!"))
 
 def handle_ticket_request(msg, conn, state):
-    """Handles the request for getting the ticket. If not existed, return an error.
+    """Handles the request for getting the ticket. If not existed, returns an error.
     
-    Arguments:
+    Arguments:\n
         msg -- message from the Requester
         conn -- the connection socket
         state -- current state of the PDL
@@ -124,9 +127,9 @@ def handle_ticket_request(msg, conn, state):
 
 
 def handle_pubkey_request(msg, conn, state):
-    """Handles the request for getting the encryption key from requesters. If not existed, return an error.
+    """Handles the request for getting the encryption key from requesters. If not existed, returns an error.
     
-    Arguments:
+    Arguments:\n
         msg -- message from the Requester
         conn -- the connection socket
         state -- current state of the PDL
@@ -139,9 +142,9 @@ def handle_pubkey_request(msg, conn, state):
         network_handling.write_message(conn, network_handling.RespError("The Requester has not connected yet!"))
 
 def handle_threshold_request(msg, conn, state):
-    """Handles the request for getting the Threshold. If not existed, return an error.
+    """Handles the request for getting the Threshold. If not existed, returns an error.
     
-    Arguments:
+    Arguments:\n
         msg -- message from the Requester
         conn -- the connection socket
         state -- current state of the PDL
@@ -154,9 +157,9 @@ def handle_threshold_request(msg, conn, state):
         network_handling.write_message(conn, network_handling.RespError("The Threshold has not been defined yet!"))
 
 def handle_generate_ticket(msg, conn, state):
-    """Handles the request for generating new ticket from the Requester. If existed, return an error.
+    """Handles the request for generating new ticket from the Requester. If existed, returns an error.
     
-    Arguments:
+    Arguments:\n
         msg -- message from the Requester
         conn -- the connection socket
         state -- current state of the PDL

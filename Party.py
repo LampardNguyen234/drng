@@ -23,7 +23,7 @@ class Party(object):
     def check_eligibility(self, T, Th):
         """A party checks if he is eligible to contribute or not (Algorithm 3)
         
-        Arguments:
+        Arguments:\n
             T -- The input ticket
             Th -- The threshold
         """
@@ -39,7 +39,7 @@ class Party(object):
         """A party checks his eligibility. If eligible, he has to contribute a number subject to the
         ticket T (Algorithm 4). 
         
-        Arguments:
+        Arguments:\n
             T -- The input ticket
             Th -- The threshold
             Y -- The encryption key of the requester
@@ -50,7 +50,7 @@ class Party(object):
             x = random_order()
             M = x*G
 
-            print("Your contribution is: {}".format(M))
+            print("\nYour contribution is: M = {}".format(M))
 
             k = random_order()
             C = k*G
@@ -86,15 +86,18 @@ def kick_off():
         Th = resp['__value__']['threshold']
         Y = resp['__value__']['pubkey']
         Y = create_point_from_XY(Y['x'], Y['y'])
-        print(T, Th, Y)
+        print("\nThe current ticket: {}".format(T))
+        print("\nThe current threshold: {}".format(Th))
+        print("\nThe public key of the Requester: {}".format(Y))
 
         poe, poc = party.contribute(T, Th, Y)
 
         if poc is None:
-            print("You are not eligible to contribute!")
+            print("\nYou are not eligible to contribute!")
         else:
             resp = send_PoC(poc)
-            print(resp)
+            if not isinstance(resp, RespError):
+                print("\nYour contribution has been received!")
 
 def send_PoC(poc):
     sock_to_PDL = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

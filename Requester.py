@@ -68,20 +68,20 @@ def kick_off():
         conn.close()
 
 def HandleMessage(msg, conn, requester):
-    print("Received a new message: {}".format(msg))
+    print("\nReceived a new message:\n{}".format(msg))
     if msg['__class__'] == 'ReqDecryption':
         msg = msg['__value__']
         C = msg['C']
         D = msg['D']
         C = create_point_from_XY(C['x'], C['y'])
         D = create_point_from_XY(D['x'], D['y'])
-        print("C =", C)
-        print("D =", D)
+        print("\nReceived a new tallied contribution:")
+        print("C = {}\nD = {}".format(C, D))
         out = requester.decrypt(C, D)
 
         req = RespDecryption(out[0], out[1], out[2])
         write_message(conn, req)
-        print("The final outcome is: {}".format(out[0]))
+        print("\nThe final outcome is:\n{}".format(out[0]))
         exit()
 
 if __name__ == '__main__':
