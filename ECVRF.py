@@ -1,7 +1,7 @@
 '''
 This module implements an Elliptic Curve-based Verifiable Random Function (ECVRF) based on the instruction from
 https://tools.ietf.org/id/draft-goldbe-vrf-01.html
-For the sake of being compatible with our protocol in the paper, sk = x, pk = y
+For the sake of being compatible with our protocol in the thesis, sk = x, pk = y
 '''
 from ecdsa.ecdsa import *
 from common import *

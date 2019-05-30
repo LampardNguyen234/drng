@@ -96,7 +96,7 @@ def handle_contribution(msg, conn, state):
                 c = resp['c']
                 z = resp['z']
 
-                M = common.create_point_from_XY(M['x'], M['y'])
+                M = common.EC_point_from_JSON(M)
 
                 if common.verify_ZKP(state.currentPubKey, M, state.currentC, state.currentD, c, z):
                     print("The final outcome is: {}".format(M))
@@ -122,8 +122,6 @@ def handle_ticket_request(msg, conn, state):
     else:
         network_handling.write_message(conn, network_handling.RespError("The current ticket has not been defined yet!"))
 
-def handle_decryption(msg, conn, state):
-    pass
 
 def handle_pubkey_request(msg, conn, state):
     """Handles the request for getting the encryption key from requesters. If not existed, return an error.

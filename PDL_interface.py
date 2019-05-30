@@ -166,13 +166,8 @@ class ReqContribution:
         pubkey_Y = params['pubkey']['y']
         pubkey = common.create_point_from_XY(pubkey_X, pubkey_Y)
 
-        C_X = params['C']['x']
-        C_Y = params['C']['y']
-        C = common.create_point_from_XY(C_X, C_Y)
-
-        D_X = params['D']['x']
-        D_Y = params['D']['y']
-        D = common.create_point_from_XY(D_X, D_Y)
+        C = common.EC_point_from_JSON(params['C'])
+        D = common.EC_point_from_JSON(params['D'])
 
         sigma_r = params['sigma_r']
         sigma_s = params['sigma_s']

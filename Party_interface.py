@@ -41,15 +41,10 @@ class PoC(object):
     
     @classmethod
     def from_dictionary(cls, params):
-        pubkey = params['pubkey']
-        pubkey_X = pubkey['x']
-        pubkey_Y = pubkey['y']
-        pubkey = common.create_pubkey_from_point(common.create_point_from_XY(pubkey_X, pubkey_Y))
-
+        pubkey = common.EC_point_from_JSON(params['pubkey'])
         T = params['T']
         y = params['y']
         pi = params['pi']
-        pubkey = common.create_pubkey_from_point(common.create_point_from_XY(pubkey_X, pubkey_Y))
         return cls(pubkey, T, y, pi)
 
     def to_dictionary(self):
