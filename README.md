@@ -33,18 +33,22 @@ pip3 install -r requirements.txt
     ```
 
 ### Message Type
-1. ReqGenTick
-2. RespGenTick
-3. ReqThreshold
-4. RespThreshold
-5. ReqTicket
-6. RespTicket
-7. ReqPubKey
-8. RespPubKey
-9. ReqContribution
-10. RespContribution
+#### ReqGenTick
+#### RespGenTick
+#### ReqThreshold
+#### RespThreshold
+#### ReqTicket
+#### RespTicket
+#### ReqPubKey
+#### RespPubKey
+#### ReqContribution
+#### RespContribution
+#### ReqDecryption
+#### RespDecryption
 
 ## Authors
 * Lampard (lnhatthanh.nguyen@gmail.com)
 
-## References
+## Assumptions
+1.  The number of parties is known beforehand as shown in the `config.py` file. In practice, there should be an initialization stage for parties to register. For the sake of implementation convenience, we discard this phase.
+2.  The *Requester* will publish the final random beacon `M` and the corresponding proof `(c, z)` onto the `PDL`. In practice, this is not required.
