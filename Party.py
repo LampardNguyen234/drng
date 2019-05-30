@@ -1,5 +1,5 @@
 from common import *
-from networkHandling import *
+from network_handling import *
 from ecdsa.ecdsa import Private_key, Public_key
 from ECVRF import ECVRF
 from Crypto.Random import random
@@ -10,7 +10,7 @@ from Party_interface import *
 class Party(object):
     def __init__(self, private_key = None):
         if private_key is None:
-            d = RandomOrder()
+            d = random_order()
             point = d*G
             self.public_key = Public_key(G, point)
             self.private_key = Private_key(self.public_key, d)
@@ -20,7 +20,7 @@ class Party(object):
         
         self.VRF = ECVRF(self.private_key)
 
-    def CheckEligibility(self, T, Th):
+    def check_eligibility(self, T, Th):
         """A party checks if he is eligible to contribute or not (Algorithm 3)
         
         Arguments:
@@ -35,7 +35,7 @@ class Party(object):
         else:
             return False, None, None
 
-    def Contribute(self, T, Th, Y):
+    def contribute(self, T, Th, Y):
         """A party checks his eligibility. If eligible, he has to contribute a number subject to the
         ticket T (Algorithm 4). 
         
@@ -44,16 +44,17 @@ class Party(object):
             Th -- The threshold
             Y -- The encryption key of the requester
         """
-        eligible, y, pi = self.CheckEligibility(T, Th)
+        eligible, y, pi = self.check_eligibility(T, Th)
         
         if eligible:
             # Y = get_public_key_from_requester()
-            x = RandomOrder()
+            # x = random_order()
+            x = 1
             M = x*G
 
             print("Your contribution is: {}".format(M))
 
-            k = RandomOrder()
+            k = random_order()
             C = k*G
             D = k*Y + M
 
@@ -66,13 +67,13 @@ class Party(object):
             h = h.hexdigest()
             h = int(h, 16)
 
-            sigma = self.private_key.sign(h, RandomOrder())
+            sigma = self.private_key.sign(h, random_order())
 
             return PoE(self.private_key.public_key, T, y, pi), PoC(self.public_key, T, C, D, sigma)
         else:
             return None, None
 
-def KickOff():
+def kick_off():
     party = Party()
 
     sock_to_PDL = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -86,18 +87,18 @@ def KickOff():
         T = resp['__value__']['ticket']
         Th = resp['__value__']['threshold']
         Y = resp['__value__']['pubkey']
-        Y = CreatePointFromXY(Y['x'], Y['y'])
+        Y = create_point_from_XY(Y['x'], Y['y'])
         print(T, Th, Y)
 
-        poe, poc = party.Contribute(T, Th, Y)
+        poe, poc = party.contribute(T, Th, Y)
 
         if poc is None:
             print("You are not eligible to contribute!")
         else:
-            resp = Send_PoC(poc)
+            resp = send_PoC(poc)
             print(resp)
 
-def Send_PoC(poc):
+def send_PoC(poc):
     sock_to_PDL = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock_to_PDL.connect(config.PDL_ADDR)
     req = PDL_interface.ReqContribution(poc.publicKey.point, poc.C, poc.D, poc.sigma.r, poc.sigma.s)
@@ -106,4 +107,4 @@ def Send_PoC(poc):
     return resp
 
 if __name__ == '__main__':
-    KickOff()
+    kick_off()

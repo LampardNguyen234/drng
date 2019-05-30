@@ -1,5 +1,5 @@
 from common import *
-from networkHandling import *
+from network_handling import *
 from Crypto.Random import random
 import config
 import PDL_interface
@@ -9,7 +9,7 @@ class Requester(object):
     
     def __init__(self, x=None):
         if x is None:
-            self.x = RandomOrder()
+            self.x = random_order()
         else:
             self.x = x
         self.Y = self.x * G
@@ -21,9 +21,11 @@ class Requester(object):
     def decrypt(self, C, D):
         M = D + (ORDER-self.x)*C
 
+        print("M =", M)
+
         D2 = D + (ORDER - 1)*M
 
-        r = RandomOrder()
+        r = random_order()
 
         B0 = r*G
         B1 = r*C
@@ -41,7 +43,7 @@ class Requester(object):
 
         return (M, c, z)
 
-def KickOff():
+def kick_off():
     requester = Requester()
 
     print(requester)
@@ -51,8 +53,6 @@ def KickOff():
     req = PDL_interface.ReqGenTick(requester.Y.x(), requester.Y.y(), random.randint(0, 2**256))
     write_message(sock_to_PDL, req)
     resp = read_message(sock_to_PDL)
-    
-    print(resp)
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind(config.REQUESTER_ADDR)
@@ -73,15 +73,16 @@ def HandleMessage(msg, conn, requester):
         msg = msg['__value__']
         C = msg['C']
         D = msg['D']
-        C = CreatePointFromXY(C['x'], C['y'])
-        D = CreatePointFromXY(D['x'], D['y'])
+        C = create_point_from_XY(C['x'], C['y'])
+        D = create_point_from_XY(D['x'], D['y'])
         print("C =", C)
         print("D =", D)
         out = requester.decrypt(C, D)
-        print(out)
 
         req = RespDecryption(out[0], out[1], out[2])
         write_message(conn, req)
+        print("The final outcome is: {}".format(out[0]))
+        exit()
 
 if __name__ == '__main__':
-    KickOff()
+    kick_off()

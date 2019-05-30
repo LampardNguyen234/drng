@@ -14,7 +14,7 @@ class PoE(object):
         T = params['T']
         y = params['y']
         pi = params['pi']
-        pubkey = common.CreatePublicKeyFromPoint(common.CreatePointFromXY(pubkey_X, pubkey_Y))
+        pubkey = common.create_pubkey_from_point(common.create_point_from_XY(pubkey_X, pubkey_Y))
         return cls(pubkey, T, y, pi)
 
     def to_dictionary(self):
@@ -44,12 +44,12 @@ class PoC(object):
         pubkey = params['pubkey']
         pubkey_X = pubkey['x']
         pubkey_Y = pubkey['y']
-        pubkey = common.CreatePublicKeyFromPoint(common.CreatePointFromXY(pubkey_X, pubkey_Y))
+        pubkey = common.create_pubkey_from_point(common.create_point_from_XY(pubkey_X, pubkey_Y))
 
         T = params['T']
         y = params['y']
         pi = params['pi']
-        pubkey = common.CreatePublicKeyFromPoint(common.CreatePointFromXY(pubkey_X, pubkey_Y))
+        pubkey = common.create_pubkey_from_point(common.create_point_from_XY(pubkey_X, pubkey_Y))
         return cls(pubkey, T, y, pi)
 
     def to_dictionary(self):

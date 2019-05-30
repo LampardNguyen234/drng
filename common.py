@@ -41,50 +41,13 @@ def ECVRF_hash_points(g, h, pk, gamma, gk, hk):
 
     return int(ha.hexdigest(), 16) % ORDER
 
-def I2OSP(x, xLen):
-    if x >= 256**xLen:
-        raise ValueError("integer too large")
-    digits = []
-
-    while x:
-        digits.append(int(x % 256))
-        x //= 256
-    for i in range(xLen - len(digits)):
-        digits.append(0)
-    return digits[::-1]
-
-def OS2IP(X):
-    xLen = len(X)
-    X = X[::-1]
-    x = 0
-    for i in range(xLen):
-        x += X[i] * 256^i
-    return x
-
-def EC2OSP(P):
-    x = P.x()
-    y = P.y()
-    return I2OSP(x, 32) + I2OSP(y, 32)
-
-
-def CreatePointFromXY(Px, Py):
+def create_point_from_XY(Px, Py):
     return Point(CURVE, Px, Py)
 
-def ComputeThreshold(k, n, l):    
+def compute_threshold(k, n, l):    
     return k*(2**l)//(n+1)
 
-def TallyContribute(C, D):
-    if len(C) != len(D):
-        return None
-    C_temp = C[0]
-    D_temp = D[0]
-    for i in range(1, len(C)):
-        C_temp = C_temp + C[i]
-        D_temp = D_temp + D[i]
-    
-    return C_temp, D_temp
-
-def VerifyZKP(Y, M, C, D, c, z):
+def verify_ZKP(Y, M, C, D, c, z):
     B0 = z*G + (ORDER - c)*Y
     D2 = D + (ORDER - 1)*M
     B1 = z*C + (ORDER - c)*D2
@@ -98,19 +61,29 @@ def VerifyZKP(Y, M, C, D, c, z):
 
     return c == int(h.hexdigest(), 16)
 
-def GenerateTicket(publicKey, nonce):
+def generate_ticket(publicKey, nonce):
     h = SHA256.new()
     h.update(str(publicKey).encode())
     h.update(str(nonce).encode())
     return int(h.hexdigest(), 16)
 
-def RandomOrder():
+def EC_point_from_JSON(JSON_point):
+    """Extracts an elliptic curve point from the given JSON
+    
+    Arguments:
+        JSON_point -- JSON representation of the point
+    """
+    Px = JSON_point['x']
+    Py = JSON_point['y']
+    return create_point_from_XY(Px, Py)
+
+def random_order():
     return random.randint(0, ORDER)
 
-def CreateSignatureFromrs(r, s):
+def create_signature_from_rs(r, s):
     return Signature(r,s)
 
-def CreatePublicKeyFromPoint(P):
+def create_pubkey_from_point(P):
     return Public_key(G, P)
 
 def egcd(a, b):
@@ -126,9 +99,3 @@ def modinv(a, m):
         raise Exception('modular inverse does not exist')
     else:
         return x % m
-
-
-
-def get_public_key_from_requester():
-    return 10*G
-

@@ -164,15 +164,15 @@ class ReqContribution:
     def from_dictionary(cls, params):
         pubkey_X = params['pubkey']['x']
         pubkey_Y = params['pubkey']['y']
-        pubkey = common.CreatePointFromXY(pubkey_X, pubkey_Y)
+        pubkey = common.create_point_from_XY(pubkey_X, pubkey_Y)
 
         C_X = params['C']['x']
         C_Y = params['C']['y']
-        C = common.CreatePointFromXY(C_X, C_Y)
+        C = common.create_point_from_XY(C_X, C_Y)
 
         D_X = params['D']['x']
         D_Y = params['D']['y']
-        D = common.CreatePointFromXY(D_X, D_Y)
+        D = common.create_point_from_XY(D_X, D_Y)
 
         sigma_r = params['sigma_r']
         sigma_s = params['sigma_s']
