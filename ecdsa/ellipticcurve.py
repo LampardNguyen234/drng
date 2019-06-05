@@ -84,10 +84,10 @@ class Point(object):
     return "<Point: x: {}, y: {}>".format(self.__x, self.__y)
   
   @classmethod
-  def from_dictionary(cls, params):
+  def from_dictionary(cls, curve, params):
       x = params['x']
       y = params['y']
-      return cls()
+      return cls(curve, x, y)
 
   def to_dictionary(self):
       return {'x': self.__x, 'y': self.__y}

@@ -3,6 +3,7 @@ This module implements an Elliptic Curve-based Verifiable Random Function (ECVRF
 https://tools.ietf.org/id/draft-goldbe-vrf-01.html
 For the sake of being compatible with our protocol in the thesis, sk = x, pk = y
 '''
+
 from ecdsa.ecdsa import *
 from common import *
 from Crypto.Random import random
@@ -16,7 +17,7 @@ class ECVRF(object):
             self.sk = random.randint(1, ORDER)
             self.pk = self.sk * G
     
-    def Prove(self, alpha):
+    def prove(self, alpha):
         """Returns a random number y, a proof pi based on input alpha and the secret key self.sk.
         
         Arguments:
@@ -27,7 +28,7 @@ class ECVRF(object):
         k = random.randint(0, ORDER)
         c = ECVRF_hash_points(G, H, self.pk, gamma, k*G, k*H)
         s = (k - c*self.sk)% ORDER
-        pi = {'gamma': gamma, 'c': c,  's': s}
+        pi = {'gamma': gamma.to_dictionary(), 'c': c,  's': s}
 
         h = SHA256.new()
         h.update(str(gamma).encode())
@@ -36,7 +37,7 @@ class ECVRF(object):
         return {'y': y, 'pi': pi, 'pk': self.pk}
     
     @staticmethod
-    def Verify(alpha, pi, pk):
+    def verify(alpha, pi, pk, y):
         """Verify the correctness of an output from the Prove function
         
         Arguments:
@@ -46,6 +47,8 @@ class ECVRF(object):
         """
         #Extract gamma, c, s from pi
         gamma = pi['gamma']
+        gamma = parse_point(gamma)
+
         c = pi['c']
         s = pi['s']
 
@@ -54,6 +57,9 @@ class ECVRF(object):
         V = c*gamma + s*H
         c_prime = ECVRF_hash_points(G, H, pk, gamma, U, V)
 
-        return c == c_prime
+        h = SHA256.new()
+        h.update(str(gamma).encode())
+
+        return c == c_prime and y == int(h.hexdigest(), 16)
 
     

@@ -28,7 +28,7 @@ def kick_off():
         conn.close()
 
 def handle_message(msg, conn, state):
-    """Handles received messages as appropriate
+    """Handles received messages as appropriate class
     
     Arguments:\n
         msg -- received message
@@ -59,58 +59,62 @@ def handle_contribution(msg, conn, state):
 
     #If the Threshold has been defined
     if not state.isExpired:
-        pubkey = common.EC_point_from_JSON(msg['pubkey'])
-        C = common.EC_point_from_JSON(msg['C'])
-        D = common.EC_point_from_JSON(msg['D'])
+        
+        poe = msg['PoE']
+        poe = PoE.from_dictionary(poe)
 
-        print("\nNew contribution received:")
-        print("C = {}\nD = {}".format(C, D))
+        if not poe or PoE.verify(poe):
+            poc = msg['PoC']
+            poc = PoC.from_dictionary(poc)
+            
 
-        sigma_r = msg['sigma_r']
-        sigma_s = msg['sigma_s']
+            pubkey = poc.pubkey
+            C = poc.C
+            D = poc.D
 
-        pubkey = common.create_pubkey_from_point(pubkey)
-        sigma = common.create_signature_from_rs(sigma_r, sigma_s)
-        poc = PoC(pubkey, state.currentTicket, C, D, sigma)
-
-        if poc.verify():
-            state.numContributor += 1
-            if state.currentC is None:
-                state.currentC = C
-                state.currentD = D
-            else:
-                state.currentC = state.currentC + C
-                state.currentD = state.currentD + D
-            network_handling.write_message(conn, RespContribution("Contribution success!"))
-            if state.numContributor == state.numParty:
-                print("\nContribution complete!")
-                print("\nSending tallied result to the Requester!")
-
-                sock_to_req = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                sock_to_req.connect(config.REQUESTER_ADDR)
-                req = Requester_interface.ReqDecryption(state.currentC, state.currentD)
-                network_handling.write_message(sock_to_req, req)
-                
-                resp = network_handling.read_message(sock_to_req)
-                print("\nReceived a decrypted message from the Requester!")
-                resp = resp['__value__']
-                
-                M = resp['M']
-                c = resp['c']
-                z = resp['z']
-                print("M = {}\nc = {}\nz = {}".format(M, c, z))
-
-                M = common.EC_point_from_JSON(M)
-
-                if common.verify_ZKP(state.currentPubKey, M, state.currentC, state.currentD, c, z):
-                    print("\nVerifying the ZKP complete!!")
-                    print("\nThe final outcome is:\n{}".format(common.hash(M)))
-                    exit()
+            print("\nNew contribution received:")
+            print("C = {}\nD = {}".format(C, D))
+            
+            if PoC.verify(poc):
+                state.numContributor += 1
+                if state.currentC is None:
+                    state.currentC = C
+                    state.currentD = D
                 else:
-                    print("\nVerifying ZKP failed!!!")
-        else:
-            network_handling.write_message(conn, network_handling.RespError("The PoC cannot be verified!"))
+                    state.currentC = state.currentC + C
+                    state.currentD = state.currentD + D
+                network_handling.write_message(conn, RespContribution("Contribution success!"))
+                print("asdasdasdas")
+                if state.numContributor == state.numParty:
+                    print("\nContribution complete!")
+                    print("\nSending tallied result to the Requester!")
 
+                    sock_to_req = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    sock_to_req.connect(config.REQUESTER_ADDR)
+                    req = Requester_interface.ReqDecryption(state.currentC, state.currentD)
+                    network_handling.write_message(sock_to_req, req)
+                    
+                    resp = network_handling.read_message(sock_to_req)
+                    print("\nReceived a decrypted message from the Requester!")
+                    resp = resp['__value__']
+                    
+                    M = resp['M']
+                    c = resp['c']
+                    z = resp['z']
+                    print("M = {}\nc = {}\nz = {}".format(M, c, z))
+
+                    M = common.parse_point(M)
+
+                    if common.verify_ZKP(state.currentPubKey, M, state.currentC, state.currentD, c, z):
+                        print("\nVerifying the ZKP complete!!")
+                        print("\nThe final outcome is:\n{}".format(common.hash(M)))
+                        exit()
+                    else:
+                        print("\nVerifying ZKP failed!!!")
+            else:
+                network_handling.write_message(conn, network_handling.RespError("The PoC cannot be verified!"))
+        else:
+            network_handling.write_message(conn, network_handling.RespError("You are not eligibile to contribute!"))
     else:
         network_handling.write_message(conn, network_handling.RespError("Contribution is not open or has been closed!"))
 
@@ -185,18 +189,22 @@ def handle_generate_ticket(msg, conn, state):
         network_handling.write_message(conn, network_handling.RespError("The current ticket has not been expired yet!"))
 
 class PDLState:
-    """
-    A model to encapsulate PDL state
+    """A model to encapsulate PDL state
     """
     def __init__(self):
         self.currentThreshold = common.compute_threshold(config.EXPECTED_NUM_CONTRIBUTORS, 
                                                         config.NUM_PARTIES,
                                                         256)
+        self.currentPubKey = None
         self.currentTicket = None
         self.isExpired = True
+
+        # self.currentPubKey = 10*common.G
+        # self.currentTicket = common.generate_ticket(self.currentPubKey, 100)
+        # self.isExpired = False
+
         self.numParty = 2
         self.numContributor = 0
-        self.currentPubKey = None
         self.currentC = None
         self.currentD = None
 

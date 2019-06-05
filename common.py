@@ -90,6 +90,12 @@ def create_signature_from_rs(r, s):
 def create_pubkey_from_point(P):
     return Public_key(G, P)
 
+def parse_point(json_point):
+    return Point.from_dictionary(CURVE, json_point)
+
+def parse_signature(json_sigma):
+    return Signature.from_dictionary(json_sigma)
+
 def egcd(a, b):
     if a == 0:
         return (b, 0, 1)

@@ -27,7 +27,7 @@ class Party(object):
             T -- The input ticket
             Th -- The threshold
         """
-        out = self.VRF.Prove(T)
+        out = self.VRF.prove(T)
         y = out['y']
         pi = out['pi']
         if y < Th:
@@ -67,11 +67,14 @@ class Party(object):
 
             sigma = self.private_key.sign(h, random_order())
 
-            return PoE(self.private_key.public_key, T, y, pi), PoC(self.public_key, T, C, D, sigma)
+            return PoE(self.public_key.point, T, y, pi), PoC(self.public_key.point, T, C, D, sigma)
         else:
             return None, None
 
 def kick_off():
+    """kicks off the party. 
+    """
+    #Create new Party
     party = Party()
 
     sock_to_PDL = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -84,25 +87,40 @@ def kick_off():
     elif resp['__class__'] == 'RespTicket':
         T = resp['__value__']['ticket']
         Th = resp['__value__']['threshold']
+
         Y = resp['__value__']['pubkey']
-        Y = create_point_from_XY(Y['x'], Y['y'])
+        Y = parse_point(Y)
+        
         print("\nThe current ticket: {}".format(T))
         print("\nThe current threshold: {}".format(Th))
         print("\nThe public key of the Requester: {}".format(Y))
 
         poe, poc = party.contribute(T, Th, Y)
 
+        # print("\npoe", poe.to_dictionary())
+        # print("\npoc", poc.to_dictionary())
+
         if poc is None:
             print("\nYou are not eligible to contribute!")
         else:
-            resp = send_PoC(poc)
+            resp = send_PoC(poe, poc)
             if not isinstance(resp, RespError):
                 print("\nYour contribution has been received!")
+            else:
+                print(resp)
 
-def send_PoC(poc):
+def send_PoC(poe, poc):
+    """sends the contributed value and poc to the PDL.
+    
+    Arguments:
+        poc -- the PoC of the party with respect to the current ticket
+    
+    Returns:
+        message -- the response message from the PDL
+    """
     sock_to_PDL = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock_to_PDL.connect(config.PDL_ADDR)
-    req = PDL_interface.ReqContribution(poc.publicKey.point, poc.C, poc.D, poc.sigma.r, poc.sigma.s)
+    req = PDL_interface.ReqContribution(poe, poc)
     write_message(sock_to_PDL, req)
     resp = read_message(sock_to_PDL)
     return resp

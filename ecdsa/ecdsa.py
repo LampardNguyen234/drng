@@ -14,8 +14,14 @@ class Signature(object):
     self.r = r
     self.s = s
   
+  @classmethod
+  def from_dictionary(cls, params):
+    r = params['r']
+    s = params['s']
+    return cls(r, s)
+
   def to_dictionary(self):
-    return {'r':r, 's':s}
+    return {'r':self.r, 's':self.s}
 
   def recover_public_keys(self, hash, generator):
     """Returns two public keys for which the signature is valid
