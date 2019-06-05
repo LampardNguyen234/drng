@@ -98,4 +98,4 @@ For the sake for convenience for programming the flow of the protocol, we make a
 1.  The number of parties is known beforehand as shown in the `config.py` file. In practice, there should be an initialization stage for parties to register. For the sake of implementation convenience, we discard this phase.
 2.  The **Requester** will publish the final random beacon `M` and the corresponding proof `(c, z)` onto the **PDL**. In practice, this is not required.
 3. Key sharing is secure and trusted.
-4. The **PDL** and **Requester** sides are secure (i.e. adversary cannot control them and/or obtain keys) and have nothing to do with each other (they are independent of each other). Connection between them is secure and trusted (e.g. communication happens over TLS/SSL and both servers know each others identity). In practice, this 
+4. The **PDL** and **Requester** sides are secure (i.e. adversary cannot control them and/or obtain keys) and have nothing to do with each other (they are independent of each other). Connection between them is secure and trusted (e.g. communication happens over TLS/SSL and both servers know each others identity).
