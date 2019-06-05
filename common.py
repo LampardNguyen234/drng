@@ -77,6 +77,10 @@ def EC_point_from_JSON(JSON_point):
     Py = JSON_point['y']
     return create_point_from_XY(Px, Py)
 
+def hash(M):
+    h = SHA256.new()
+    h.update(str(M).encode())
+    return int(h.hexdigest(), 16)
 def random_order():
     return random.randint(0, ORDER)
 

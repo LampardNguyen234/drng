@@ -36,7 +36,7 @@ def handle_message(msg, conn, state):
         state -- current state of the PDL
     """
 
-    print("\nReceived a new message: {} from {}".format(msg['__value__'], conn.getpeername()))
+    # print("\nReceived a new message: {} from {}".format(msg, conn.getpeername()))
     if msg['__class__'] == 'ReqGenTick':
         handle_generate_ticket(msg['__value__'], conn, state)
     elif msg['__class__'] == 'ReqThreshold':
@@ -84,6 +84,7 @@ def handle_contribution(msg, conn, state):
             network_handling.write_message(conn, RespContribution("Contribution success!"))
             if state.numContributor == state.numParty:
                 print("\nContribution complete!")
+                print("\nSending tallied result to the Requester!")
 
                 sock_to_req = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock_to_req.connect(config.REQUESTER_ADDR)
@@ -91,16 +92,19 @@ def handle_contribution(msg, conn, state):
                 network_handling.write_message(sock_to_req, req)
                 
                 resp = network_handling.read_message(sock_to_req)
+                print("\nReceived a decrypted message from the Requester!")
                 resp = resp['__value__']
                 
                 M = resp['M']
                 c = resp['c']
                 z = resp['z']
+                print("M = {}\nc = {}\nz = {}".format(M, c, z))
 
                 M = common.EC_point_from_JSON(M)
 
                 if common.verify_ZKP(state.currentPubKey, M, state.currentC, state.currentD, c, z):
-                    print("\nThe final outcome is:\n{}".format(M))
+                    print("\nVerifying the ZKP complete!!")
+                    print("\nThe final outcome is:\n{}".format(common.hash(M)))
                     exit()
                 else:
                     print("\nVerifying ZKP failed!!!")
@@ -124,7 +128,6 @@ def handle_ticket_request(msg, conn, state):
         network_handling.write_message(conn, RespTicket(state.currentTicket, state.currentThreshold, state.currentPubKey))
     else:
         network_handling.write_message(conn, network_handling.RespError("The current ticket has not been defined yet!"))
-
 
 def handle_pubkey_request(msg, conn, state):
     """Handles the request for getting the encryption key from requesters. If not existed, returns an error.
@@ -164,7 +167,6 @@ def handle_generate_ticket(msg, conn, state):
         conn -- the connection socket
         state -- current state of the PDL
     """
-
     #If the ticket has not been created or the current one has not been expired
     if state.isExpired:
         state.isExpired = False
@@ -174,9 +176,10 @@ def handle_generate_ticket(msg, conn, state):
         pubkey = common.create_point_from_XY(pubkey_X, pubkey_Y)
 
         nonce = msg['nonce']
+        print("A new ticket generation request has been received!")
+        print("Public Key: {}\nnonce: {}".format(pubkey, nonce))
         state.currentTicket = common.generate_ticket(pubkey, nonce)
         state.currentPubKey = pubkey
-        print("State", state)
         network_handling.write_message(conn, RespGenTick(state.currentTicket))
     else:
         network_handling.write_message(conn, network_handling.RespError("The current ticket has not been expired yet!"))
