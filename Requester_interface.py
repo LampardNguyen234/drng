@@ -6,13 +6,11 @@ class ReqDecryption(object):
     
     @classmethod
     def from_dictionary(cls, params):
-        C_X = params['C']['x']
-        C_Y = params['D']['y']
-        D_X = params['D']['x']
-        D_Y = params['D']['y']
+        C = params['C']
+        D = params['D']
 
-        C = common.create_point_from_XY(C_X, C_Y)
-        D = common.create_point_from_XY(D_X, D_Y)
+        C = common.parse_point(C)
+        D = common.parse_point(D)
         return cls(C, D)
 
     def to_dictionary(self):
@@ -27,12 +25,11 @@ class RespDecryption(object):
     
     @classmethod
     def from_dictionary(cls, params):
-        M_X = params['M']['x']
-        M_Y = params['M']['y']
+        M = params['M']
         c = params['c']
         z = params['z']
 
-        M = common.create_point_from_XY(M_X, M_Y)
+        M = common.parse_point(M)
 
         return cls(M, c, z)
 

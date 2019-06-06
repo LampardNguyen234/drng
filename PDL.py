@@ -54,7 +54,7 @@ def handle_contribution(msg, conn, state):
     Arguments:\n
         msg -- message from the Requester
         conn -- the connection socket
-        state -- current state of the PDL
+        stapubkeyrent state of the PDL
     """
 
     #If the Threshold has been defined
@@ -175,9 +175,8 @@ def handle_generate_ticket(msg, conn, state):
     if state.isExpired:
         state.isExpired = False
 
-        pubkey_X = msg['pubkey_X']
-        pubkey_Y = msg['pubkey_Y']
-        pubkey = common.create_point_from_XY(pubkey_X, pubkey_Y)
+        pubkey = msg['pubkey']
+        pubkey = common.parse_point(pubkey)
 
         nonce = msg['nonce']
         print("A new ticket generation request has been received!")

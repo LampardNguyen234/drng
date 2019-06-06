@@ -7,23 +7,24 @@ class ReqGenTick:
     """
     Request to generate a ticket
     """
-    def __init__(self, pubkey_X, pubkey_Y, nonce):
-        self.pubkey_X = pubkey_X
-        self.pubkey_Y = pubkey_Y
+    def __init__(self, pubkey, nonce):
+        self.pubkey = pubkey
         self.nonce = nonce
 
     def __repr__(self):
-        return "<ReqGenTick: pubkey: ({}, {}), nonce: {}>".format(self.pubkey_X, self.pubkey_Y, self.nonce)
+        return "<ReqGenTick: pubkey: {}, nonce: {}>".format(self.pubkey, self.nonce)
 
     @classmethod
     def from_dictionary(cls, params):
-        pubkey_X = params['pubkey_X']
-        pubkey_Y = params['pubkey_Y']
+        pubkey = params['pubkey']
+        pubkey = common.parse_point(pubkey)
+
         nonce = params['nonce']
-        return cls(pubkey_X, pubkey_Y, nonce)
+        
+        return cls(pubkey, nonce)
 
     def to_dictionary(self):
-        return {'pubkey_X': self.pubkey_X, 'pubkey_Y': self.pubkey_Y, 'nonce': self.nonce}
+        return {'pubkey': self.pubkey, 'nonce': self.nonce}
 
 class RespGenTick:
     """
