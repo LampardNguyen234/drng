@@ -52,6 +52,14 @@ def compute_threshold(k, n, l):
     return k*(2**l)//(n+1)
 
 def verify_ZKP(Y, M, C, D, c, z):
+    """Verifies that M has been decrypted from the ciphertext (C,D)
+    
+    Arguments:\n
+        Y -- the public key
+        M -- the decrypted point
+        (C, D) -- the ciphertext
+        (c, z) -- the proof of proper decryption 
+    """
     B0 = z*G + (ORDER - c)*Y
     D2 = D + (ORDER - 1)*M
     B1 = z*C + (ORDER - c)*D2
