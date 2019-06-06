@@ -19,7 +19,7 @@ def ECVRF_hash_to_curve(alpha, Y=None):
     
     Returns: alpha * Generator + Y
     """
-    if pk is None:
+    if Y is None:
         return alpha * G
     else:
         return alpha*G + Y

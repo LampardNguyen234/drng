@@ -20,7 +20,7 @@ class ECVRF(object):
     def prove(self, alpha):
         """Returns a random number y, a proof pi based on input alpha and the secret key self.sk.
         
-        Arguments:
+        Arguments:\n
             alpha -- input to the VRF
         """ 
         H = ECVRF_hash_to_curve(alpha, self.pk)
@@ -40,7 +40,7 @@ class ECVRF(object):
     def verify(alpha, pi, pk, y):
         """Verify the correctness of an output from the Prove function
         
-        Arguments:
+        Arguments:\n
             alpha -- The input to VRF
             pi -- The proof produced by the Prove function
             pk -- The public key

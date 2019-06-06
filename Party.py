@@ -21,7 +21,7 @@ class Party(object):
         self.VRF = ECVRF(self.private_key)
 
     def check_eligibility(self, T, Th):
-        """A party checks if he is eligible to contribute or not (Algorithm 3)
+        """Checks if the party is eligible to contribute or not (Algorithm 3)
         
         Arguments:\n
             T -- The input ticket
@@ -72,16 +72,19 @@ class Party(object):
             return None, None
 
 def kick_off():
-    """kicks off the party. 
+    """Starts the operation of the party
     """
+    
     #Create new Party
     party = Party()
 
+    #Create a socket to the PDL and send a request for the current ticket
     sock_to_PDL = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock_to_PDL.connect(config.PDL_ADDR)
     req = PDL_interface.ReqTicket()
     write_message(sock_to_PDL, req)
     resp = read_message(sock_to_PDL)
+
     if isinstance(resp, RespError):
         print(resp)
     elif resp['__class__'] == 'RespTicket':
@@ -97,26 +100,21 @@ def kick_off():
 
         poe, poc = party.contribute(T, Th, Y)
 
-        # print("\npoe", poe.to_dictionary())
-        # print("\npoc", poc.to_dictionary())
-
         if poc is None:
             print("\nYou are not eligible to contribute!")
         else:
-            resp = send_PoC(poe, poc)
+            resp = send_contribution(poe, poc)
             if not isinstance(resp, RespError):
                 print("\nYour contribution has been received!")
             else:
                 print(resp)
 
-def send_PoC(poe, poc):
-    """sends the contributed value and poc to the PDL.
+def send_contribution(poe, poc):
+    """Sends the contribution, poe and poc to the PDL.
     
     Arguments:
-        poc -- the PoC of the party with respect to the current ticket
-    
-    Returns:
-        message -- the response message from the PDL
+        poe -- the PoE with respect to the current ticket
+        poc -- the PoC consisting of the contribution and the proof
     """
     sock_to_PDL = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock_to_PDL.connect(config.PDL_ADDR)

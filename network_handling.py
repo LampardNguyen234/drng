@@ -7,8 +7,7 @@ import json
 import socket
 
 class RespError:
-    """
-    represents an error response from the server
+    """A class that represents an error response from the server
     """
     def __init__(self, msg):
         self.msg = msg
@@ -26,12 +25,11 @@ class RespError:
 
 
 def write_message(conn, obj):
-    """
-    Writes a message to the socket
+    """Writes a message to the socket
 
-    :param conn: the socket to write to
-    :param obj: any python object supported by pickle, it will be written to the socket
-    :return:
+    Arguments:\n
+        conn -- the socket to write to
+        obj -- any python object to be written to the socket
     """
 
     msg = json.dumps(obj, default=_to_json).encode('utf-8')
@@ -40,11 +38,10 @@ def write_message(conn, obj):
     conn.sendall(buf_to_write)
 
 def read_message(conn):
-    """
-    Reads message from a socket
+    """Reads message from a socket
 
-    :param conn: the socket to read from
-    :return: length of the message OR None if message length cannot be read
+    Arguments:\n
+        conn -- the socket to write to
     """
 
     buf = _read_socket_buf(conn, 4)
@@ -64,12 +61,11 @@ def read_message(conn):
     return obj
 
 def _read_socket_buf(conn, n):
-    """
-    Reads buffer from conn up to n bytes
+    """Reads buffer from conn up to n bytes
 
-    :param conn: the socket to read from
-    :param n: number of bytes to read
-    :return: the buffer OR None
+    Arguments:\n
+        conn -- the socket to read from
+        n -- number of bytes to read
     """
     buf = b''
     while len(buf) < n:
@@ -81,11 +77,10 @@ def _read_socket_buf(conn, n):
 
 
 def _to_json(python_object):
-    """
-    converts request and response objects used in the system to python serializable objects
+    """Converts request and response objects used in the system to python serializable objects
 
-    :param python_object: object to convert to json serializable object
-    :return: json serializable representation of `python_object`
+    Arguments:\n
+        python_object: object to convert to json serializable object
     """
     if isinstance(python_object, RespError):
         return  {'__class__': 'RespError',
@@ -131,10 +126,10 @@ def _to_json(python_object):
 
 
 def _from_json(json_object):
-    """
-    converts json object to python object
-    :param json: object to convert from
-    :return: python object corresponding to json object
+    """Converts json object to python object
+
+    Arguments:\n
+        json_object: object to convert from
     """
 
     if '__class__' in json_object:

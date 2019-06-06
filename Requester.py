@@ -80,7 +80,7 @@ def kick_off():
         conn.close()
 
 def HandleMessage(msg, conn, requester):
-    """Handles received messages as appropriate class
+    """Handles received messages as appropriate type
     
     Arguments:\n
         msg -- received message

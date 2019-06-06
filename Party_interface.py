@@ -5,7 +5,6 @@ from ECVRF import ECVRF
 class PoE(object):
     '''A model to encapsulate the PoE description
     '''
-
     def __init__(self, pubkey, T, y, pi):
         self.pubkey = pubkey
         self.T = T
@@ -46,7 +45,6 @@ class PoE(object):
 class PoC(object):
     '''A model to encapsulate the PoC description
     '''
-
     def __init__(self, pubkey, T, C, D, sigma):
         self.pubkey = pubkey
         self.T = T

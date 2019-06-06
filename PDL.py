@@ -28,7 +28,7 @@ def kick_off():
         conn.close()
 
 def handle_message(msg, conn, state):
-    """Handles received messages as appropriate class
+    """Handles received messages as appropriate type
     
     Arguments:\n
         msg -- received message
@@ -84,7 +84,6 @@ def handle_contribution(msg, conn, state):
                     state.currentC = state.currentC + C
                     state.currentD = state.currentD + D
                 network_handling.write_message(conn, RespContribution("Contribution success!"))
-                print("asdasdasdas")
                 if state.numContributor == state.numParty:
                     print("\nContribution complete!")
                     print("\nSending tallied result to the Requester!")
