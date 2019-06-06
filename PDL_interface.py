@@ -23,7 +23,7 @@ class ReqGenTick:
         return cls(pubkey, nonce)
 
     def to_dictionary(self):
-        return {'pubkey': self.pubkey, 'nonce': self.nonce}
+        return {'pubkey': self.pubkey.to_dictionary(), 'nonce': self.nonce}
 
 class RespGenTick:
     """Response to generate a ticket

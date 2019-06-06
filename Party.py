@@ -71,57 +71,51 @@ class Party(object):
         else:
             return None, None
 
-def kick_off():
-    """Starts the operation of the party
-    """
-    
-    #Create new Party
-    party = Party()
+    def kick_off(self, T=None, Th=None, Y=None):
+        """Starts the operation of the party
 
-    #Create a socket to the PDL and send a request for the current ticket
-    sock_to_PDL = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock_to_PDL.connect(config.PDL_ADDR)
-    req = PDL_interface.ReqTicket()
-    write_message(sock_to_PDL, req)
-    resp = read_message(sock_to_PDL)
+        Arguments:\n
+            T -- the current ticket
+            Th -- the current threshold
+            Y -- the current public key of the Requester
+        """
+        if T is None:
+            sock_to_PDL = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock_to_PDL.connect(config.PDL_ADDR)
+            req = PDL_interface.ReqTicket()
+            write_message(sock_to_PDL, req)
+            resp = read_message(sock_to_PDL)
 
-    if isinstance(resp, RespError):
-        print(resp)
-    elif resp['__class__'] == 'RespTicket':
-        T = resp['__value__']['ticket']
-        Th = resp['__value__']['threshold']
+            if isinstance(resp, RespError):
+                print(resp)
+            elif resp['__class__'] == 'RespTicket':
+                T = resp['__value__']['ticket']
+                Th = resp['__value__']['threshold']
 
-        Y = resp['__value__']['pubkey']
-        Y = parse_point(Y)
-        
-        print("\nThe current ticket: {}".format(T))
-        print("\nThe current threshold: {}".format(Th))
-        print("\nThe public key of the Requester: {}".format(Y))
+                Y = resp['__value__']['pubkey']
+                Y = common.parse_point(Y)
 
-        poe, poc = party.contribute(T, Th, Y)
+        self.poe, self.poc = self.contribute(T, Th, Y)
 
-        if poc is None:
+        if self.poc is None:
             print("\nYou are not eligible to contribute!")
         else:
-            resp = send_contribution(poe, poc)
+            resp = self.send_contribution()
             if not isinstance(resp, RespError):
                 print("\nYour contribution has been received!")
             else:
                 print(resp)
 
-def send_contribution(poe, poc):
-    """Sends the contribution, poe and poc to the PDL.
-    
-    Arguments:
-        poe -- the PoE with respect to the current ticket
-        poc -- the PoC consisting of the contribution and the proof
-    """
-    sock_to_PDL = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock_to_PDL.connect(config.PDL_ADDR)
-    req = PDL_interface.ReqContribution(poe, poc)
-    write_message(sock_to_PDL, req)
-    resp = read_message(sock_to_PDL)
-    return resp
+    def send_contribution(self):
+        """Sends the contribution, poe and poc to the PDL.
+        """
+        sock_to_PDL = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock_to_PDL.connect(config.PDL_ADDR)
+        req = PDL_interface.ReqContribution(self.poe, self.poc)
+        write_message(sock_to_PDL, req)
+        resp = read_message(sock_to_PDL)
+        return resp
 
 if __name__ == '__main__':
-    kick_off()
+    party = Party()
+    party.kick_off()
