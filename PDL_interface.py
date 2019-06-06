@@ -1,11 +1,10 @@
+"""Contains request and response objects for Public Distributed Ledger (PDL)
+"""
+
 import common
 from Party_interface import PoC, PoE
-"""
-Contains request and response objects for Public Distributed Ledger (PDL)
-"""
 class ReqGenTick:
-    """
-    Request to generate a ticket
+    """Request to generate a ticket
     """
     def __init__(self, pubkey, nonce):
         self.pubkey = pubkey
@@ -27,8 +26,7 @@ class ReqGenTick:
         return {'pubkey': self.pubkey, 'nonce': self.nonce}
 
 class RespGenTick:
-    """
-    Response to generate a ticket
+    """Response to generate a ticket
     """
     def __init__(self, ticket):
         self.ticket = ticket
@@ -45,8 +43,7 @@ class RespGenTick:
         return {'ticket': self.ticket}
 
 class ReqThreshold:
-    """
-    Request to get the Threshold
+    """Request to get the Threshold
     """
     def __repr__(self):
         return "<ReqThreshold: Request for the Threshold>"
@@ -59,8 +56,7 @@ class ReqThreshold:
         return {}
 
 class RespThreshold:
-    """
-    Response to get the Threshold
+    """Response to get the Threshold
     """
     def __init__(self, threshold):
         self.threshold = threshold
@@ -77,8 +73,7 @@ class RespThreshold:
         return {'threshold': self.threshold}
 
 class ReqTicket:
-    """
-    Request to get the current ticket
+    """Request to get the current ticket
     """
     def __repr__(self):
         return "<ReqTicket: Request for the current ticket>"
@@ -91,8 +86,7 @@ class ReqTicket:
         return {}
 
 class RespTicket:
-    """
-    Response to get the current ticket
+    """Response to get the current ticket
     """
     def __init__(self, ticket, threshold, pubkey):
         self.ticket = ticket
@@ -113,8 +107,7 @@ class RespTicket:
         return {'ticket': self.ticket, 'threshold': self.threshold, 'pubkey': self.pubkey.to_dictionary()}
 
 class ReqPubKey:
-    """
-    Request to get the encryption key of the requester
+    """Request to get the encryption key of the requester
     """
     def __repr__(self):
         return "<ReqPubKey: Request for the encryption key>"
@@ -127,8 +120,7 @@ class ReqPubKey:
         return {}
 
 class RespPubKey:
-    """
-    Response to generate a ticket
+    """Response to generate a ticket
     """
     def __init__(self, pubkey_X, pubkey_Y):
         self.pubkey_X = pubkey_X
@@ -146,42 +138,9 @@ class RespPubKey:
     def to_dictionary(self):
         return {'pubkey_X': self.pubkey_X, 'pubkey_Y': self.pubkey_Y}
 
-# class ReqContribution:
-#     """
-#     Party sends a contribution to the PDL
-#     """
-#     def __init__(self, pubkey, C, D, sigma_r, sigma_s):
-#         self.pubkey = pubkey
-#         self.C = C
-#         self.D = D
-#         self.sigma_r = sigma_r
-#         self.sigma_s = sigma_s
-        
-
-#     def __repr__(self):
-#         return "<ReqContribution: pubkey: {}, C: {}, D: {}, sigma: ({}, {})>".format(
-#             self.pubkey, self.C.to_dictionary(), self.D.to_dictionary(), self.sigma_r, self.sigma_s)
-
-#     @classmethod
-#     def from_dictionary(cls, params):
-#         pubkey_X = params['pubkey']['x']
-#         pubkey_Y = params['pubkey']['y']
-#         pubkey = common.create_point_from_XY(pubkey_X, pubkey_Y)
-
-#         C = common.EC_point_from_JSON(params['C'])
-#         D = common.EC_point_from_JSON(params['D'])
-
-#         sigma_r = params['sigma_r']
-#         sigma_s = params['sigma_s']
-#         return cls(pubkey, C, D, sigma_r, sigma_s)
-
-#     def to_dictionary(self):
-#         return {'pubkey': self.pubkey.to_dictionary(), 'C': self.C.to_dictionary(), 
-#         'D': self.D.to_dictionary(), 'sigma_r': self.sigma_r, 'sigma_s': self.sigma_s}
 
 class ReqContribution:
-    """
-    Party sends a contribution to the PDL
+    """Party sends a contribution to the PDL
     """
     def __init__(self, poe, poc):
         self.poe = poe;
@@ -205,8 +164,7 @@ class ReqContribution:
         return {'PoE': self.poe.to_dictionary(), 'PoC': self.poc.to_dictionary()}
 
 class RespContribution:
-    """
-    Response to a contribution from the PDL to the party
+    """Response to a contribution from the PDL to the party
     """
     def __init__(self, msg):
         self.msg = msg

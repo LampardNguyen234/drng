@@ -63,6 +63,7 @@ def handle_contribution(msg, conn, state):
         poe = msg['PoE']
         poe = PoE.from_dictionary(poe)
 
+        #Verify the PoE
         if not poe or PoE.verify(poe):
             poc = msg['PoC']
             poc = PoC.from_dictionary(poc)
@@ -75,6 +76,7 @@ def handle_contribution(msg, conn, state):
             print("\nNew contribution received:")
             print("C = {}\nD = {}".format(C, D))
             
+            #Verify the PoC
             if PoC.verify(poc):
                 state.numContributor += 1
                 if state.currentC is None:
@@ -84,6 +86,8 @@ def handle_contribution(msg, conn, state):
                     state.currentC = state.currentC + C
                     state.currentD = state.currentD + D
                 network_handling.write_message(conn, RespContribution("Contribution success!"))
+
+                #Condition for the contribution process to finish
                 if state.numContributor == state.numParty:
                     print("\nContribution complete!")
                     print("\nSending tallied result to the Requester!")
@@ -170,7 +174,7 @@ def handle_generate_ticket(msg, conn, state):
         conn -- the connection socket
         state -- current state of the PDL
     """
-    #If the ticket has not been created or the current one has not been expired
+    #If the ticket has not been created or the current one has not been expired then creates a new one
     if state.isExpired:
         state.isExpired = False
 
