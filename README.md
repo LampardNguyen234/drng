@@ -1,6 +1,6 @@
 # Distributed random number generation based on homomorphic encryption
 This repo is a proof of concept of our work on scalable distributed random number generation based on 
-ElGamal homomorphic encryption on Elliptic Curves (ECC). Please follow this [link](https://github.com/LampardNguyen234/drng) to get the latest update about the project.
+ElGamal homomorphic encryption on Elliptic Curves (ECC). Please follow this [project](https://github.com/LampardNguyen234/drng) to get the latest update about the project.
 This proposed protocol is the very first one that utilizes homomorphic encryption as the building block for generating random numbers on distributed environments.
 The protocol operates in rounds, each round will produce a random beacon (with high probability). Each round consists of the following stages (we assume that all parties are known beforehand):
 
