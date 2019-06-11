@@ -94,7 +94,7 @@ This indicates an error has occurred.
 * Lampard (lnhatthanh.nguyen@gmail.com)
 
 ## Assumptions
-For the sake for convenience for programming the flow of the protocol, we make a few assumptions as follows:
+For the sake of convenience in programming the flow of the protocol, we make a few assumptions as follows:
 1.  The number of parties is known beforehand as shown in the `config.py` file. In practice, there should be an initialization stage for parties to register. For the sake of implementation convenience, we discard this phase.
 2.  The **Requester** will publish the final random beacon `M` and the corresponding proof `(c, z)` onto the **PDL**. In practice, this is not required.
 3. Key sharing is secure and trusted.
